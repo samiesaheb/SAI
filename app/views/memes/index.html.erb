@@ -1,0 +1,43 @@
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Meme Library</h1>
+    <p class="community-meta"><a href="<%= community_path(@community) %>"><%= @community.name %></a></p>
+  </div>
+  <a href="<%= new_community_meme_path(@community) %>" class="btn btn-primary">Upload Meme</a>
+</div>
+
+<div class="category-tabs">
+  <a href="<%= community_memes_path(@community) %>" class="tab <%= 'active' if @category.blank? %>">All</a>
+  <% Meme::CATEGORIES.each do |cat| %>
+    <a href="<%= community_memes_path(@community, category: cat) %>" class="tab <%= 'active' if @category == cat %>">
+      <%= cat == "psychology" ? "🧠" : cat == "psychedelics" ? "🍄" : "🕉️" %> <%= cat.titleize %>
+    </a>
+  <% end %>
+</div>
+
+<% if @canon_memes.any? %>
+  <div class="canon-section">
+    <h2>📜 Canon</h2>
+    <p class="section-subtitle">Community-approved sacred memes</p>
+    <div class="meme-grid">
+      <% @canon_memes.each do |meme| %>
+        <%= render "meme_card", meme: meme, community: @community %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<h2 style="margin: 2rem 0 1rem;">All Memes</h2>
+<% if @memes.any? %>
+  <div class="meme-grid">
+    <% @memes.each do |meme| %>
+      <%= render "meme_card", meme: meme, community: @community %>
+    <% end %>
+  </div>
+<% else %>
+  <div class="card empty-state">
+    <h3>No memes yet</h3>
+    <p>Be the first to upload a meme!</p>
+    <a href="<%= new_community_meme_path(@community) %>" class="btn btn-primary" style="margin-top: 1rem;">Upload Meme</a>
+  </div>
+<% end %>

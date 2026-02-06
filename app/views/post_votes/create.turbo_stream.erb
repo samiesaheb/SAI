@@ -1,0 +1,11 @@
+<%= turbo_stream.replace "post-vote-inline-#{@post.id}" do %>
+  <div class="post-vote-inline" id="post-vote-inline-<%= @post.id %>">
+    <%= render "shared/post_votes_inline", post: @post, community: @community %>
+  </div>
+<% end %>
+
+<%= turbo_stream.replace "post-vote-large-#{@post.id}" do %>
+  <div class="post-vote-large" id="post-vote-large-<%= @post.id %>">
+    <%= render "shared/post_votes_large", post: @post, community: @community %>
+  </div>
+<% end %>

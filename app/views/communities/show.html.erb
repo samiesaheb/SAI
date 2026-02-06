@@ -1,0 +1,178 @@
+<div class="page-header">
+  <div>
+    <h1 class="page-title"><%= @community.name %></h1>
+    <p class="community-meta" style="margin-top: 0.25rem;">
+      <%= @community.category.titleize %> &middot;
+      <%= @community.member_count %> members &middot;
+      <%= @community.consensus_threshold %>% consensus threshold &middot;
+      <%= @community.voting_period_days %> day voting period
+    </p>
+  </div>
+  <% if @is_member %>
+    <div style="display: flex; gap: 0.5rem;">
+      <a href="<%= new_community_proposal_path(@community) %>" class="btn btn-primary">New Proposal</a>
+      <% if current_user.admin_of?(@community) %>
+        <a href="<%= edit_community_path(@community) %>" class="btn btn-secondary">Settings</a>
+      <% end %>
+    </div>
+  <% elsif logged_in? %>
+    <%= button_to "Join Community", community_membership_path(@community), method: :post, class: "btn btn-primary" %>
+  <% else %>
+    <div style="display: flex; gap: 0.5rem;">
+      <a href="<%= login_path %>" class="btn btn-primary">Sign In</a>
+      <a href="<%= signup_path %>" class="btn btn-secondary">Sign Up</a>
+    </div>
+  <% end %>
+</div>
+
+<% if @community.description.present? %>
+  <div class="card">
+    <p><%= @community.description %></p>
+  </div>
+<% end %>
+
+<% if @is_member %>
+  <% @my_membership = current_user.memberships.find_by(community: @community) %>
+  <div class="reputation-card">
+    <div class="rep-header">
+      <span class="rep-emoji"><%= @my_membership.level_emoji %></span>
+      <div class="rep-info">
+        <span class="rep-level"><%= @my_membership.reputation_level.titleize %></span>
+        <span class="rep-points"><%= @my_membership.reputation %> reputation</span>
+      </div>
+      <div class="rep-weight">
+        <span class="weight-value"><%= @my_membership.vote_weight %>x</span>
+        <span class="weight-label">vote weight</span>
+      </div>
+    </div>
+    <div class="rep-progress-container">
+      <div class="rep-progress-bar">
+        <div class="rep-progress-fill" style="width: <%= @my_membership.level_progress %>%;"></div>
+      </div>
+      <% if @my_membership.next_level_at %>
+        <span class="rep-next"><%= @my_membership.next_level_at - @my_membership.reputation %> pts to next level</span>
+      <% else %>
+        <span class="rep-next">Max level reached!</span>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<% @active_proposals = @community.active_proposals.includes(:author, :votes) %>
+<% @laws = @community.laws.by_date.limit(5) %>
+
+<div class="grid grid-2">
+  <div>
+    <h2 style="margin-bottom: 1rem;">Active Proposals</h2>
+    <% if @active_proposals.any? %>
+      <% @active_proposals.each do |proposal| %>
+        <div class="card proposal-card">
+          <div class="proposal-header">
+            <h3 class="proposal-title">
+              <a href="<%= community_proposal_path(@community, proposal) %>"><%= proposal.title %></a>
+            </h3>
+            <span class="status-badge status-voting">Voting</span>
+          </div>
+          <p class="proposal-meta">
+            by <%= proposal.author.display_name_or_username %> &middot;
+            <%= time_ago_in_words(proposal.voting_ends_at) %> left
+          </p>
+          <div class="vote-progress" style="margin-top: 1rem;">
+            <div class="progress-label">
+              <span>Yes: <%= proposal.yes_percentage %>%</span>
+              <span><%= proposal.total_votes %> votes</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill yes" style="width: <%= proposal.yes_percentage %>%;"></div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="card empty-state">
+        <h3>No active proposals</h3>
+        <p>Be the first to submit a proposal!</p>
+      </div>
+    <% end %>
+    <a href="<%= community_proposals_path(@community) %>" class="btn btn-secondary" style="margin-top: 0.5rem;">View All Proposals</a>
+  </div>
+
+  <div>
+    <h2 style="margin-bottom: 1rem;">Recent Laws</h2>
+    <% if @laws.any? %>
+      <% @laws.each do |law| %>
+        <div class="card law-card">
+          <h3 class="proposal-title">
+            <a href="<%= community_law_path(@community, law) %>"><%= law.title %></a>
+          </h3>
+          <p class="law-version">
+            v<%= law.version %> &middot; Passed <%= time_ago_in_words(law.passed_at) %> ago
+          </p>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="card empty-state">
+        <h3>No laws yet</h3>
+        <p>Laws will appear here when proposals pass.</p>
+      </div>
+    <% end %>
+    <a href="<%= community_laws_path(@community) %>" class="btn btn-secondary" style="margin-top: 0.5rem;">View All Laws</a>
+  </div>
+</div>
+
+<div style="margin-top: 2rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+    <h2>Meme Library</h2>
+    <a href="<%= community_memes_path(@community) %>" class="btn btn-secondary btn-small">View All</a>
+  </div>
+  <% @recent_memes = @community.memes.canon.or(@community.memes.approved).by_score.limit(4) %>
+  <% if @recent_memes.any? %>
+    <div class="meme-grid">
+      <% @recent_memes.each do |meme| %>
+        <%= render "memes/meme_card", meme: meme, community: @community %>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="card empty-state">
+      <h3>No memes yet</h3>
+      <p>Upload memes about psychology, psychedelics, and religion.</p>
+      <% if @is_member %>
+        <a href="<%= new_community_meme_path(@community) %>" class="btn btn-primary" style="margin-top: 1rem;">Upload Meme</a>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<div style="margin-top: 2rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+    <h2>Recent Posts</h2>
+    <a href="<%= community_posts_path(@community) %>" class="btn btn-secondary btn-small">View All</a>
+  </div>
+  <% @recent_posts = @community.posts.canon.or(@community.posts.approved).by_score.limit(3) %>
+  <% if @recent_posts.any? %>
+    <div class="post-list">
+      <% @recent_posts.each do |post| %>
+        <%= render "posts/post_card", post: post, community: @community %>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="card empty-state">
+      <h3>No posts yet</h3>
+      <p>Write long-form content about the topics that matter to your community.</p>
+      <% if @is_member %>
+        <a href="<%= new_community_post_path(@community) %>" class="btn btn-primary" style="margin-top: 1rem;">New Post</a>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<% if @is_member && current_user.admin_of?(@community) %>
+  <div class="invite-section">
+    <h3>Invite Members</h3>
+    <p style="color: var(--text-muted); font-size: 0.875rem;">Share this link to invite people to join your community.</p>
+    <div class="invite-link">
+      <input type="text" value="<%= join_url(token: @community.invite_token) %>" readonly id="invite-link">
+      <button class="btn btn-secondary" onclick="navigator.clipboard.writeText(document.getElementById('invite-link').value); this.textContent='Copied!';">Copy</button>
+    </div>
+  </div>
+<% end %>

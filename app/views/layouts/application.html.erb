@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "Common Consensus" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+    <script>
+      function toggleReplyForm(commentId) {
+        var form = document.getElementById("reply-form-" + commentId);
+        if (form) {
+          form.style.display = form.style.display === "none" ? "block" : "none";
+          if (form.style.display === "block") {
+            var textarea = form.querySelector("textarea");
+            if (textarea) textarea.focus();
+          }
+        }
+      }
+    </script>
+  </head>
+
+  <body>
+    <nav class="navbar">
+      <div class="container">
+        <div class="navbar-top">
+          <a href="<%= root_path %>" class="logo">Common Consensus</a>
+          <div class="navbar-user">
+            <% if logged_in? %>
+              <span class="user-info"><%= current_user.display_name_or_username %></span>
+              <%= button_to "Logout", logout_path, method: :delete, class: "btn btn-secondary btn-small" %>
+            <% else %>
+              <a href="<%= login_path %>" class="btn btn-secondary btn-small">Login</a>
+              <a href="<%= signup_path %>" class="btn btn-primary btn-small">Sign Up</a>
+            <% end %>
+          </div>
+        </div>
+        <div class="navbar-search">
+          <%= form_tag search_path, method: :get, class: "search-form", data: { controller: "search", action: "submit->search#submit" } do %>
+            <div class="search-input-wrapper">
+              <input type="text" name="q" placeholder="Search communities, posts, memes..." value="<%= params[:q] %>" class="search-input" data-search-target="input" data-action="input->search#toggleClear">
+              <button type="button" class="search-clear" data-search-target="clear" data-action="search#clear" hidden>&times;</button>
+            </div>
+            <button type="submit" class="search-btn">🔍</button>
+          <% end %>
+        </div>
+        <div class="navbar-block">
+          <a href="<%= blocks_path %>" class="nav-block-link">⛓️ Block #<%= Block.current_height %></a>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container">
+      <% if flash[:notice] %>
+        <div class="flash flash-notice"><%= flash[:notice] %></div>
+      <% end %>
+      <% if flash[:alert] %>
+        <div class="flash flash-alert"><%= flash[:alert] %></div>
+      <% end %>
+
+      <%= yield %>
+    </main>
+
+    <footer class="footer">
+      <div class="container">
+        <p>Common Consensus - Building consensus through transparent governance</p>
+      </div>
+    </footer>
+  </body>
+</html>

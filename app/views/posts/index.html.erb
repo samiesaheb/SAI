@@ -1,0 +1,49 @@
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Posts</h1>
+    <p class="community-meta"><a href="<%= community_path(@community) %>"><%= @community.name %></a></p>
+  </div>
+  <a href="<%= new_community_post_path(@community) %>" class="btn btn-primary">New Post</a>
+</div>
+
+<div class="category-tabs">
+  <a href="<%= community_posts_path(@community) %>" class="tab <%= 'active' if @category.blank? %>">All</a>
+  <% Post::CATEGORIES.each do |cat| %>
+    <a href="<%= community_posts_path(@community, category: cat, sort: @sort) %>" class="tab <%= 'active' if @category == cat %>">
+      <%= Post.new(category: cat).category_label %>
+    </a>
+  <% end %>
+</div>
+
+<div class="post-sort-tabs">
+  <a href="<%= community_posts_path(@community, category: @category, sort: "score") %>" class="tab <%= 'active' if @sort == 'score' %>">Top Scored</a>
+  <a href="<%= community_posts_path(@community, category: @category, sort: "quality") %>" class="tab <%= 'active' if @sort == 'quality' %>">Best Quality</a>
+  <a href="<%= community_posts_path(@community, category: @category, sort: "recent") %>" class="tab <%= 'active' if @sort == 'recent' %>">Recent</a>
+</div>
+
+<% if @canon_posts.any? %>
+  <div class="canon-section">
+    <h2>📜 Canon Posts</h2>
+    <p class="section-subtitle">Community-approved essential writings</p>
+    <div class="post-list">
+      <% @canon_posts.each do |post| %>
+        <%= render "post_card", post: post, community: @community %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<h2 style="margin: 2rem 0 1rem;">All Posts</h2>
+<% if @posts.any? %>
+  <div class="post-list">
+    <% @posts.each do |post| %>
+      <%= render "post_card", post: post, community: @community %>
+    <% end %>
+  </div>
+<% else %>
+  <div class="card empty-state">
+    <h3>No posts yet</h3>
+    <p>Be the first to write a post!</p>
+    <a href="<%= new_community_post_path(@community) %>" class="btn btn-primary" style="margin-top: 1rem;">New Post</a>
+  </div>
+<% end %>

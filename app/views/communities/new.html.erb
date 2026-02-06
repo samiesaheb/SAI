@@ -1,0 +1,62 @@
+<div style="max-width: 600px;">
+  <div class="page-header">
+    <h1 class="page-title">Create Community</h1>
+  </div>
+
+  <% if @community.errors.any? %>
+    <div class="error-messages">
+      <h4><%= pluralize(@community.errors.count, "error") %> prevented this community from being created:</h4>
+      <ul>
+        <% @community.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="card">
+    <%= form_with model: @community do |f| %>
+      <div class="form-group">
+        <%= f.label :name %>
+        <%= f.text_field :name, autofocus: true, required: true %>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :description %>
+        <%= f.text_area :description, rows: 4 %>
+        <p class="form-hint">Describe what this community is about.</p>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :category %>
+        <%= f.select :category, Community::CATEGORIES.map { |c| [c.titleize, c] }, {}, { required: true } %>
+        <p class="form-hint">Choose a category that best describes your community.</p>
+      </div>
+
+      <h3 style="margin: 1.5rem 0 1rem; font-size: 1rem;">Consensus Settings</h3>
+
+      <div class="form-group">
+        <%= f.label :consensus_threshold, "Consensus Threshold (%)" %>
+        <%= f.number_field :consensus_threshold, min: 50, max: 100, value: 67 %>
+        <p class="form-hint">Percentage of Yes votes required for a proposal to pass (50-100%).</p>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :quorum_percentage, "Quorum (%)" %>
+        <%= f.number_field :quorum_percentage, min: 1, max: 100, value: 50 %>
+        <p class="form-hint">Minimum percentage of members who must vote (1-100%).</p>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :voting_period_days, "Voting Period (days)" %>
+        <%= f.number_field :voting_period_days, min: 1, max: 90, value: 7 %>
+        <p class="form-hint">How long proposals stay open for voting (1-90 days).</p>
+      </div>
+
+      <div style="display: flex; gap: 0.5rem; margin-top: 1.5rem;">
+        <%= f.submit "Create Community", class: "btn btn-primary" %>
+        <a href="<%= communities_path %>" class="btn btn-secondary">Cancel</a>
+      </div>
+    <% end %>
+  </div>
+</div>

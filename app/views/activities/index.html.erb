@@ -1,0 +1,21 @@
+<div class="page-header">
+  <h1 class="page-title">Activity Feed</h1>
+  <a href="<%= root_path %>" class="btn btn-secondary">Back to Dashboard</a>
+</div>
+
+<% if @activities.any? %>
+  <div class="activities-list">
+    <%= render partial: "activity", collection: @activities %>
+  </div>
+
+  <% if @has_more %>
+    <div style="text-align: center; margin-top: 2rem;">
+      <%= link_to "Load More", activities_path(page: @page + 1), class: "btn btn-secondary" %>
+    </div>
+  <% end %>
+<% else %>
+  <div class="card empty-state">
+    <h3>No activity yet</h3>
+    <p>Activity from your communities will appear here.</p>
+  </div>
+<% end %>

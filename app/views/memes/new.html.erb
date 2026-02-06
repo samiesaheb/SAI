@@ -1,0 +1,66 @@
+<div style="max-width: 600px;">
+  <p class="community-meta" style="margin-bottom: 0.5rem;">
+    <a href="<%= community_path(@community) %>"><%= @community.name %></a> &rsaquo;
+    <a href="<%= community_memes_path(@community) %>">Memes</a>
+  </p>
+
+  <div class="page-header">
+    <h1 class="page-title">Upload Meme</h1>
+  </div>
+
+  <% if @meme.errors.any? %>
+    <div class="error-messages">
+      <h4><%= pluralize(@meme.errors.count, "error") %> prevented upload:</h4>
+      <ul>
+        <% @meme.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="card">
+    <%= form_with model: [@community, @meme], html: { multipart: true } do |f| %>
+      <div class="form-group">
+        <%= f.label :image, "Upload Image File" %>
+        <%= f.file_field :image, accept: "image/*", class: "file-input" %>
+        <p class="form-hint">PNG, JPG, or GIF. Max 10MB.</p>
+      </div>
+
+      <div style="text-align: center; color: var(--text-muted); margin: 1rem 0; font-weight: 500;">
+        — OR —
+      </div>
+
+      <div class="form-group">
+        <%= f.label :image_url, "Image URL" %>
+        <%= f.url_field :image_url, placeholder: "https://i.imgur.com/example.jpg" %>
+        <p class="form-hint">Paste a <strong>direct link</strong> to an image file. Right-click an image and select "Copy image address". Links to webpages (like Alamy, Pinterest) won't work - you need the actual image URL.</p>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :title %>
+        <%= f.text_field :title, required: true, placeholder: "Give your meme a title" %>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :category %>
+        <%= f.select :category, Meme::CATEGORIES.map { |c| [c == "psychology" ? "🧠 Psychology" : c == "psychedelics" ? "🍄 Psychedelics" : "🕉️ Religion", c] }, { prompt: "Select a category" }, required: true %>
+      </div>
+
+      <div class="card" style="background: var(--bg); margin-bottom: 1.5rem;">
+        <h4 style="font-size: 0.875rem; margin-bottom: 0.5rem;">How Canon Works</h4>
+        <ul style="font-size: 0.875rem; color: var(--text-muted); margin-left: 1.25rem;">
+          <li>Your meme starts with 0 points</li>
+          <li>Community members can upvote or downvote</li>
+          <li>Reach <strong><%= Meme::CANON_THRESHOLD %> points</strong> to achieve Canon status</li>
+          <li>Canon memes are preserved as community doctrine</li>
+        </ul>
+      </div>
+
+      <div style="display: flex; gap: 0.5rem;">
+        <%= f.submit "Upload Meme", class: "btn btn-primary" %>
+        <a href="<%= community_memes_path(@community) %>" class="btn btn-secondary">Cancel</a>
+      </div>
+    <% end %>
+  </div>
+</div>

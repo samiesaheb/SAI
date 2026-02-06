@@ -1,0 +1,39 @@
+<div style="max-width: 800px;">
+  <p class="community-meta" style="margin-bottom: 0.5rem;">
+    <a href="<%= blocks_path %>">Block Explorer</a>
+  </p>
+
+  <div class="page-header">
+    <h1 class="page-title">Block #<%= @block.height %></h1>
+  </div>
+
+  <div class="card">
+    <table class="block-details">
+      <tr>
+        <th>Height</th>
+        <td><%= @block.height %></td>
+      </tr>
+      <tr>
+        <th>Timestamp</th>
+        <td><%= @block.formatted_timestamp %></td>
+      </tr>
+      <tr>
+        <th>Hash</th>
+        <td><code class="block-hash-full"><%= @block.hash_value %></code></td>
+      </tr>
+      <tr>
+        <th>Previous Hash</th>
+        <td><code class="block-hash-full"><%= @block.previous_hash %></code></td>
+      </tr>
+    </table>
+  </div>
+
+  <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+    <% if @block.height > 0 %>
+      <a href="<%= block_path(@block.height - 1) %>" class="btn btn-secondary">&larr; Block #<%= @block.height - 1 %></a>
+    <% end %>
+    <% if Block.find_by(height: @block.height + 1) %>
+      <a href="<%= block_path(@block.height + 1) %>" class="btn btn-secondary">Block #<%= @block.height + 1 %> &rarr;</a>
+    <% end %>
+  </div>
+</div>

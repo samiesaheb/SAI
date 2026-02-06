@@ -1,0 +1,40 @@
+<div style="max-width: 600px;">
+  <p class="community-meta" style="margin-bottom: 0.5rem;">
+    <a href="<%= community_path(@community) %>"><%= @community.name %></a> &rsaquo;
+    <a href="<%= community_proposal_path(@community, @proposal) %>"><%= @proposal.title %></a>
+  </p>
+
+  <div class="page-header">
+    <h1 class="page-title">Edit Proposal</h1>
+  </div>
+
+  <% if @proposal.errors.any? %>
+    <div class="error-messages">
+      <h4><%= pluralize(@proposal.errors.count, "error") %> prevented this proposal from being saved:</h4>
+      <ul>
+        <% @proposal.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="card">
+    <%= form_with model: [@community, @proposal], method: :patch do |f| %>
+      <div class="form-group">
+        <%= f.label :title %>
+        <%= f.text_field :title, required: true %>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :body, "Proposal Details" %>
+        <%= f.text_area :body, required: true, rows: 10 %>
+      </div>
+
+      <div style="display: flex; gap: 0.5rem;">
+        <%= f.submit "Save Changes", class: "btn btn-primary" %>
+        <a href="<%= community_proposal_path(@community, @proposal) %>" class="btn btn-secondary">Cancel</a>
+      </div>
+    <% end %>
+  </div>
+</div>

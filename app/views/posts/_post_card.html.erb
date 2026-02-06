@@ -1,0 +1,28 @@
+<div class="post-card <%= 'canon' if post.canon? %>">
+  <div class="post-card-content">
+    <div class="post-vote-inline" id="post-vote-inline-<%= post.id %>">
+      <%= render "shared/post_votes_inline", post: post, community: community %>
+    </div>
+    <div class="post-card-info">
+      <h3><a href="<%= community_post_path(community, post) %>"><%= post.title %></a></h3>
+      <p class="post-card-meta">
+        <span class="meme-category"><%= post.category_label %></span>
+        <% if post.canon? %>
+          <span class="canon-badge">📜 Canon</span>
+        <% end %>
+        <% if post.quality_score > 0 %>
+          <span class="quality-badge quality-<%= post.quality_score >= 70 ? 'high' : post.quality_score >= 40 ? 'medium' : 'low' %>">
+            Q: <%= post.quality_score %>
+          </span>
+        <% end %>
+        <span class="post-word-count"><%= post.word_count %> words</span>
+      </p>
+      <p class="post-card-excerpt"><%= truncate(post.body, length: 200) %></p>
+      <p class="post-card-author">
+        by <%= post.author.display_name_or_username %>
+        in <a href="<%= community_path(community) %>" style="color: var(--primary);"><%= community.name %></a> &middot;
+        <%= time_ago_in_words(post.created_at) %> ago
+      </p>
+    </div>
+  </div>
+</div>

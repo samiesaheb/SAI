@@ -1,0 +1,44 @@
+class PostVotesController < ApplicationController
+  before_action :require_login
+  before_action :set_community
+  before_action :set_post
+  before_action :require_membership
+
+  def create
+    @post_vote = @post.post_votes.find_or_initialize_by(user: current_user)
+    new_value = params[:value].to_i
+
+    if @post_vote.persisted? && @post_vote.value == new_value
+      respond_to do |format|
+        format.html { redirect_to community_post_path(@community, @post) }
+        format.turbo_stream { head :ok }
+      end
+      return
+    end
+
+    @post_vote.value = new_value
+    @post_vote.save
+
+    respond_to do |format|
+      format.html { redirect_to community_post_path(@community, @post) }
+      format.turbo_stream
+    end
+  end
+
+  private
+
+  def set_community
+    @community = Community.find_by!(slug: params[:community_slug])
+  end
+
+  def set_post
+    @post = @community.posts.find(params[:post_id])
+  end
+
+  def require_membership
+    unless current_user.member_of?(@community)
+      flash[:alert] = "You must be a member to vote."
+      redirect_to community_path(@community)
+    end
+  end
+end

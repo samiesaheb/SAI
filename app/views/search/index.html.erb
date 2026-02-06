@@ -1,0 +1,93 @@
+<div class="page-header">
+  <h1 class="page-title">Search</h1>
+</div>
+
+<% if @query.present? %>
+  <div class="search-type-tabs" style="margin-bottom: 1.5rem;">
+    <a href="<%= search_path(q: @query, type: "all") %>" class="tab <%= 'active' if @type == 'all' %>">
+      All (<%= @total_count %>)
+    </a>
+    <a href="<%= search_path(q: @query, type: "communities") %>" class="tab <%= 'active' if @type == 'communities' %>">
+      Communities (<%= @communities.size %>)
+    </a>
+    <a href="<%= search_path(q: @query, type: "posts") %>" class="tab <%= 'active' if @type == 'posts' %>">
+      Posts (<%= @posts.size %>)
+    </a>
+    <a href="<%= search_path(q: @query, type: "memes") %>" class="tab <%= 'active' if @type == 'memes' %>">
+      Memes (<%= @memes.size %>)
+    </a>
+  </div>
+
+  <p style="margin-bottom: 1.5rem; color: var(--text-muted);">
+    Showing results for "<strong><%= @query %></strong>"
+  </p>
+
+  <% if @total_count == 0 %>
+    <div class="card empty-state">
+      <h3>No results found</h3>
+      <p>Try a different search term or broaden your search.</p>
+    </div>
+  <% end %>
+
+  <%# Communities results %>
+  <% if @communities.any? && %w[all communities].include?(@type) %>
+    <div class="search-section">
+      <h2 style="margin-bottom: 1rem;">Communities</h2>
+      <% @communities.each do |community| %>
+        <div class="card community-card">
+          <div class="community-info">
+            <h3><a href="<%= community_path(community) %>"><%= community.name %></a></h3>
+            <p class="community-meta">
+              <%= community.category.titleize %> &middot;
+              <%= community.member_count %> members &middot;
+              <%= community.consensus_threshold %>% consensus threshold
+            </p>
+            <% if community.description.present? %>
+              <p style="margin-top: 0.5rem; color: var(--text-muted);"><%= truncate(community.description, length: 150) %></p>
+            <% end %>
+          </div>
+          <div class="community-stats">
+            <div>
+              <div class="stat-value"><%= community.active_proposals.count %></div>
+              <div class="stat-label">Active</div>
+            </div>
+            <div>
+              <div class="stat-value"><%= community.laws.count %></div>
+              <div class="stat-label">Laws</div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <%# Posts results %>
+  <% if @posts.any? && %w[all posts].include?(@type) %>
+    <div class="search-section">
+      <h2 style="margin: 2rem 0 1rem;">Posts</h2>
+      <div class="post-list">
+        <% @posts.each do |post| %>
+          <%= render "posts/post_card", post: post, community: post.community %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <%# Memes results %>
+  <% if @memes.any? && %w[all memes].include?(@type) %>
+    <div class="search-section">
+      <h2 style="margin: 2rem 0 1rem;">Memes</h2>
+      <div class="meme-grid">
+        <% @memes.each do |meme| %>
+          <%= render "memes/meme_card", meme: meme, community: meme.community %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+<% else %>
+  <div class="card empty-state">
+    <h3>Search Common Consensus</h3>
+    <p>Find communities, posts, and memes across the platform.</p>
+  </div>
+<% end %>

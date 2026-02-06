@@ -1,0 +1,3 @@
+<%= turbo_stream.replace "law-vote-#{@law.id}" do %>
+  <%= render "shared/law_votes", law: @law, community: @community %>
+<% end %>

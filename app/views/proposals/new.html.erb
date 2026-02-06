@@ -1,0 +1,49 @@
+<div style="max-width: 600px;">
+  <p class="community-meta" style="margin-bottom: 0.5rem;">
+    <a href="<%= community_path(@community) %>"><%= @community.name %></a>
+  </p>
+
+  <div class="page-header">
+    <h1 class="page-title">New Proposal</h1>
+  </div>
+
+  <% if @proposal.errors.any? %>
+    <div class="error-messages">
+      <h4><%= pluralize(@proposal.errors.count, "error") %> prevented this proposal from being created:</h4>
+      <ul>
+        <% @proposal.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="card">
+    <%= form_with model: [@community, @proposal] do |f| %>
+      <div class="form-group">
+        <%= f.label :title %>
+        <%= f.text_field :title, autofocus: true, required: true, placeholder: "A clear, concise title for your proposal" %>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :body, "Proposal Details" %>
+        <p class="form-hint">Describe your proposal in detail. What should change? Why is this important? How will it benefit the community?</p>
+        <%= f.text_area :body, required: true, rows: 10 %>
+      </div>
+
+      <div class="card" style="background: var(--bg); margin-bottom: 1.5rem;">
+        <h4 style="font-size: 0.875rem; margin-bottom: 0.5rem;">Voting Rules</h4>
+        <ul style="font-size: 0.875rem; color: var(--text-muted); margin-left: 1.25rem;">
+          <li>Voting will be open for <strong><%= @community.voting_period_days %> days</strong></li>
+          <li>Requires <strong><%= @community.consensus_threshold %>%</strong> yes votes to pass</li>
+          <li>At least <strong><%= @community.quorum_percentage %>%</strong> of members must vote</li>
+        </ul>
+      </div>
+
+      <div style="display: flex; gap: 0.5rem;">
+        <%= f.submit "Submit Proposal", class: "btn btn-primary" %>
+        <a href="<%= community_path(@community) %>" class="btn btn-secondary">Cancel</a>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,130 @@
+<div style="max-width: 800px;">
+  <p class="community-meta" style="margin-bottom: 0.5rem;">
+    <a href="<%= community_path(@community) %>"><%= @community.name %></a> &rsaquo;
+    <a href="<%= community_proposals_path(@community) %>">Proposals</a>
+  </p>
+
+  <div class="page-header">
+    <h1 class="page-title"><%= @proposal.title %></h1>
+    <span class="status-badge status-<%= @proposal.status %>"><%= @proposal.status.capitalize %></span>
+  </div>
+
+  <div class="card">
+    <p class="proposal-meta" style="margin-bottom: 1rem;">
+      Proposed by <%= @proposal.author.display_name_or_username %> &middot;
+      Created <%= time_ago_in_words(@proposal.created_at) %> ago
+      <% if @proposal.voting_active? %>
+        &middot; <span class="time-remaining"><%= time_ago_in_words(@proposal.voting_ends_at) %> left to vote</span>
+      <% end %>
+    </p>
+
+    <div class="proposal-body"><%= @proposal.body %></div>
+
+    <% if @proposal.author == current_user && @proposal.voting_active? %>
+      <div style="margin-top: 1.5rem; display: flex; gap: 0.5rem;">
+        <a href="<%= edit_community_proposal_path(@community, @proposal) %>" class="btn btn-secondary btn-small">Edit</a>
+        <%= button_to "Withdraw", community_proposal_path(@community, @proposal), method: :delete, class: "btn btn-danger btn-small", data: { confirm: "Are you sure you want to withdraw this proposal?" } %>
+      </div>
+    <% end %>
+  </div>
+
+  <% if @proposal.voting_active? %>
+    <div class="voting-section" id="voting-section">
+      <h3>Cast Your Vote</h3>
+      <div id="vote-error"></div>
+
+      <div class="vote-buttons">
+        <%= form_with url: community_proposal_votes_path(@community, @proposal), method: :post, data: { turbo: true } do |f| %>
+          <input type="hidden" name="value" value="yes">
+          <button type="submit" class="vote-btn yes <%= 'selected' if @user_vote&.yes? %>">Yes</button>
+        <% end %>
+
+        <%= form_with url: community_proposal_votes_path(@community, @proposal), method: :post, data: { turbo: true } do |f| %>
+          <input type="hidden" name="value" value="no">
+          <button type="submit" class="vote-btn no <%= 'selected' if @user_vote&.no? %>">No</button>
+        <% end %>
+
+        <%= form_with url: community_proposal_votes_path(@community, @proposal), method: :post, data: { turbo: true } do |f| %>
+          <input type="hidden" name="value" value="abstain">
+          <button type="submit" class="vote-btn abstain <%= 'selected' if @user_vote&.abstain? %>">Abstain</button>
+        <% end %>
+      </div>
+
+      <% if @user_vote %>
+        <p style="color: var(--text-muted); font-size: 0.875rem;">
+          You voted: <strong><%= @user_vote.value.capitalize %></strong>. You can change your vote until voting ends.
+        </p>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="card" style="margin-top: 1.5rem;">
+    <h3 style="margin-bottom: 1rem;">Voting Results</h3>
+
+    <div class="vote-progress">
+      <div class="progress-label">
+        <span>Yes: <%= @proposal.yes_votes %> (<%= @proposal.yes_percentage %>%)</span>
+        <span>Threshold: <%= @community.consensus_threshold %>%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill yes" style="width: <%= @proposal.yes_percentage %>%;"></div>
+      </div>
+    </div>
+
+    <div class="vote-progress">
+      <div class="progress-label">
+        <span>No: <%= @proposal.no_votes %> (<%= @proposal.no_percentage %>%)</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill no" style="width: <%= @proposal.no_percentage %>%;"></div>
+      </div>
+    </div>
+
+    <div class="vote-progress">
+      <div class="progress-label">
+        <span>Participation: <%= @proposal.total_votes %>/<%= @community.member_count %> members</span>
+        <span>Quorum: <%= @community.quorum_percentage %>%</span>
+      </div>
+      <div class="progress-bar">
+        <% participation = @community.member_count > 0 ? (@proposal.total_votes.to_f / @community.member_count * 100).round(1) : 0 %>
+        <div class="progress-fill quorum" style="width: <%= [participation, 100].min %>%;"></div>
+      </div>
+    </div>
+
+    <% if @proposal.voting_ended? || @proposal.status != "voting" %>
+      <div class="consensus-status <%= @proposal.status == 'passed' ? 'met' : 'not-met' %>">
+        <% if @proposal.status == "passed" %>
+          Consensus reached - This proposal has become law.
+        <% elsif @proposal.status == "failed" %>
+          <% if !@proposal.quorum_met? %>
+            Failed - Quorum not met (<%= (@proposal.total_votes.to_f / @community.member_count * 100).round(1) %>% participation).
+          <% else %>
+            Failed - Consensus threshold not reached (<%= @proposal.yes_percentage %>% < <%= @community.consensus_threshold %>%).
+          <% end %>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="consensus-status <%= @proposal.consensus_reached? && @proposal.quorum_met? ? 'met' : 'not-met' %>">
+        <% if @proposal.quorum_met? && @proposal.consensus_reached? %>
+          On track to pass if voting ended now.
+        <% elsif !@proposal.quorum_met? %>
+          Quorum not yet met - need more participation.
+        <% else %>
+          Consensus threshold not yet reached.
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <% if @proposal.law.present? %>
+    <div class="card law-card" style="margin-top: 1.5rem;">
+      <h3>Enacted as Law</h3>
+      <p style="margin-top: 0.5rem;">
+        <a href="<%= community_law_path(@community, @proposal.law) %>">
+          View Law v<%= @proposal.law.version %>
+        </a>
+        &middot; Passed <%= time_ago_in_words(@proposal.law.passed_at) %> ago
+      </p>
+    </div>
+  <% end %>
+</div>

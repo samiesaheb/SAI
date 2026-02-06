@@ -1,0 +1,23 @@
+<div class="meme-card <%= 'canon' if meme.canon? %>">
+  <a href="<%= community_meme_path(community, meme) %>" class="meme-image-link">
+    <% if meme.image.attached? %>
+      <%= image_tag meme.image, class: "meme-image", alt: meme.title, loading: "lazy" %>
+    <% else %>
+      <div class="meme-image meme-placeholder">No Image</div>
+    <% end %>
+  </a>
+  <div class="meme-card-content">
+    <div class="meme-vote-inline" id="meme-vote-inline-<%= meme.id %>">
+      <%= render "shared/meme_votes_inline", meme: meme, community: community %>
+    </div>
+    <div class="meme-info">
+      <h3><a href="<%= community_meme_path(community, meme) %>"><%= meme.title %></a></h3>
+      <p class="meme-meta">
+        <span class="meme-category"><%= meme.category_label %></span>
+        <% if meme.canon? %>
+          <span class="canon-badge">📜 Canon</span>
+        <% end %>
+      </p>
+    </div>
+  </div>
+</div>

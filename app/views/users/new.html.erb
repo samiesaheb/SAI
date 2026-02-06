@@ -1,0 +1,51 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <h1>Sign Up</h1>
+
+    <% if @user.errors.any? %>
+      <div class="error-messages">
+        <h4><%= pluralize(@user.errors.count, "error") %> prevented signup:</h4>
+        <ul>
+          <% @user.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <%= form_with model: @user, url: signup_path do |f| %>
+      <div class="form-group">
+        <%= f.label :email %>
+        <%= f.email_field :email, autofocus: true, required: true %>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :username %>
+        <%= f.text_field :username, required: true %>
+        <p class="form-hint">Letters, numbers, and underscores only. 3-30 characters.</p>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :display_name, "Display Name (optional)" %>
+        <%= f.text_field :display_name %>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :password %>
+        <%= f.password_field :password, required: true %>
+        <p class="form-hint">Minimum 8 characters.</p>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :password_confirmation, "Confirm Password" %>
+        <%= f.password_field :password_confirmation, required: true %>
+      </div>
+
+      <%= f.submit "Create Account", class: "btn btn-primary", style: "width: 100%;" %>
+    <% end %>
+
+    <div class="auth-footer">
+      Already have an account? <a href="<%= login_path %>">Sign in</a>
+    </div>
+  </div>
+</div>

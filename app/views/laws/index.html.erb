@@ -1,0 +1,39 @@
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Laws</h1>
+    <p class="community-meta"><a href="<%= community_path(@community) %>"><%= @community.name %></a></p>
+  </div>
+</div>
+
+<p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+  Laws are proposals that have reached consensus and been adopted by the community.
+  They represent the collective decisions and rules of <%= @community.name %>.
+</p>
+
+<% if @laws.any? %>
+  <% @laws.each do |law| %>
+    <div class="card law-card law-card-with-votes">
+      <%= render "shared/law_votes", law: law, community: @community %>
+      <div class="law-content">
+        <div class="proposal-header">
+          <h3 class="proposal-title">
+            <a href="<%= community_law_path(@community, law) %>"><%= law.title %></a>
+          </h3>
+          <span class="law-version">v<%= law.version %></span>
+        </div>
+        <p class="proposal-meta">
+          Passed <%= law.formatted_passed_at %>
+        </p>
+        <p style="margin-top: 0.75rem; color: var(--text-muted);">
+          <%= truncate(law.body, length: 200) %>
+        </p>
+      </div>
+    </div>
+  <% end %>
+<% else %>
+  <div class="card empty-state">
+    <h3>No laws yet</h3>
+    <p>When proposals pass the consensus threshold, they become laws and appear here.</p>
+    <a href="<%= new_community_proposal_path(@community) %>" class="btn btn-primary" style="margin-top: 1rem;">Submit a Proposal</a>
+  </div>
+<% end %>

@@ -1,0 +1,115 @@
+<div style="max-width: 900px;">
+  <p class="community-meta" style="margin-bottom: 0.5rem;">
+    <a href="<%= community_path(@community) %>"><%= @community.name %></a> &rsaquo;
+    <a href="<%= community_posts_path(@community) %>">Posts</a>
+  </p>
+
+  <div class="post-show">
+    <div class="post-show-content">
+      <h1 class="post-title"><%= @post.title %></h1>
+
+      <div class="post-show-meta">
+        <span class="category-badge"><%= @post.category_label %></span>
+        <% if @post.canon? %>
+          <span class="status-badge status-passed">📜 Canon</span>
+        <% end %>
+        <% if @post.quality_score > 0 %>
+          <span class="quality-badge quality-<%= @post.quality_score >= 70 ? 'high' : @post.quality_score >= 40 ? 'medium' : 'low' %>">
+            Quality: <%= @post.quality_score %>
+          </span>
+        <% end %>
+        <span class="post-word-count"><%= @post.word_count %> words</span>
+      </div>
+
+      <div class="post-body">
+        <%= simple_format(@post.body) %>
+      </div>
+
+      <% if @post.parsed_sources.any? %>
+        <div class="post-sources">
+          <h3>Sources & Citations</h3>
+          <ul>
+            <% @post.parsed_sources.each do |source| %>
+              <li>
+                <% if source["url"].present? %>
+                  <a href="<%= source["url"] %>" target="_blank" rel="noopener"><%= source["title"].presence || source["url"] %></a>
+                <% else %>
+                  <%= source["title"] %>
+                <% end %>
+                <% if source["author"].present? %>
+                  <span class="source-author">— <%= source["author"] %></span>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="post-show-sidebar">
+      <div class="post-vote-large" id="post-vote-large-<%= @post.id %>">
+        <%= render "shared/post_votes_large", post: @post, community: @community %>
+      </div>
+
+      <div class="post-sidebar-info">
+        <p class="meme-meta-info">
+          Written by <strong><%= @post.author.display_name_or_username %></strong><br>
+          <%= time_ago_in_words(@post.created_at) %> ago
+        </p>
+
+        <% if @post.ml_category.present? && @post.ml_category != @post.category %>
+          <div class="ml-info">
+            <span class="ml-label">ML Suggested:</span> <%= @post.ml_category.titleize %>
+          </div>
+        <% end %>
+
+        <% if @post.canon? %>
+          <div class="canon-info">
+            <strong>Achieved Canon Status</strong><br>
+            <%= @post.canon_at.strftime("%B %d, %Y") %>
+          </div>
+        <% end %>
+
+        <% if @post.bitcoin_block_height.present? %>
+          <div class="bitcoin-stamp">
+            <strong>Bitcoin Block Stamp</strong><br>
+            Block #<%= @post.bitcoin_block_height %><br>
+            <code class="block-hash-truncated"><%= @post.bitcoin_block_hash.to_s[0..15] %>...</code>
+          </div>
+        <% end %>
+
+        <% if @post.locked? %>
+          <div class="lock-info">
+            🔒 Locked for <%= @post.locked_until_block - Block.current_height %> more blocks
+          </div>
+        <% end %>
+
+        <div class="meme-actions">
+          <% if @post.author == current_user || current_user.admin_of?(@community) %>
+            <%= button_to "Delete", community_post_path(@community, @post), method: :delete, class: "btn btn-danger btn-small", data: { confirm: "Delete this post?" } %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="comments-section">
+    <h2 class="comments-header">Comments (<%= @post.comments.count %>)</h2>
+
+    <% if logged_in? && @is_member %>
+      <%= render "comments/form", community: @community, commentable: @post %>
+    <% elsif !logged_in? %>
+      <p class="comment-login-prompt"><a href="<%= login_path %>">Log in</a> to comment.</p>
+    <% end %>
+
+    <div class="comments-list">
+      <% if @comments.any? %>
+        <% @comments.each do |comment| %>
+          <%= render "comments/comment", comment: comment, community: @community, commentable: @post %>
+        <% end %>
+      <% else %>
+        <p class="comments-empty">No comments yet. Be the first to share your thoughts!</p>
+      <% end %>
+    </div>
+  </div>
+</div>

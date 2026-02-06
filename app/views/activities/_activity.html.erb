@@ -1,0 +1,37 @@
+<div class="activity-item <%= activity.css_class %>">
+  <span class="activity-icon"><%= activity.icon %></span>
+  <div class="activity-content">
+    <p class="activity-description">
+      <% if activity.trackable.present? %>
+        <% case activity.action
+           when "post_created", "post_canon" %>
+          <strong><%= activity.user.username %></strong>
+          <%= activity.action == "post_created" ? "created" : "achieved canon with" %>
+          <a href="<%= trackable_path(activity) %>"><%= activity.trackable.title %></a>
+        <% when "meme_created", "meme_canon" %>
+          <strong><%= activity.user.username %></strong>
+          <%= activity.action == "meme_created" ? "shared" : "achieved canon with" %>
+          <a href="<%= trackable_path(activity) %>"><%= activity.trackable.title %></a>
+        <% when "proposal_created" %>
+          <strong><%= activity.user.username %></strong> submitted
+          <a href="<%= trackable_path(activity) %>"><%= activity.trackable.title %></a>
+        <% when "proposal_passed" %>
+          <a href="<%= trackable_path(activity) %>"><%= activity.trackable.title %></a> passed
+        <% when "proposal_failed" %>
+          <a href="<%= trackable_path(activity) %>"><%= activity.trackable.title %></a> failed
+        <% when "user_joined" %>
+          <strong><%= activity.user.username %></strong> joined
+        <% else %>
+          <%= activity.description %>
+        <% end %>
+      <% else %>
+        <%= activity.description %>
+      <% end %>
+    </p>
+    <span class="activity-meta">
+      in <a href="<%= community_path(activity.community) %>"><%= activity.community.name %></a>
+      &middot;
+      <%= time_ago_in_words(activity.created_at) %> ago
+    </span>
+  </div>
+</div>

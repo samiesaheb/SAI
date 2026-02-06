@@ -1,0 +1,67 @@
+<div class="page-header">
+  <h1 class="page-title">Communities</h1>
+  <a href="<%= new_community_path %>" class="btn btn-primary">Create Community</a>
+</div>
+
+<h2 style="margin-bottom: 1rem;">My Communities</h2>
+<% if @my_communities.any? %>
+  <% @my_communities.each do |community| %>
+    <div class="card community-card">
+      <div class="community-info">
+        <h3><a href="<%= community_path(community) %>"><%= community.name %></a></h3>
+        <p class="community-meta">
+          <%= community.category.titleize %> &middot;
+          <%= community.member_count %> members &middot;
+          <%= community.consensus_threshold %>% consensus threshold
+        </p>
+        <% if community.description.present? %>
+          <p style="margin-top: 0.5rem; color: var(--text-muted);"><%= truncate(community.description, length: 150) %></p>
+        <% end %>
+      </div>
+      <div class="community-stats">
+        <div>
+          <div class="stat-value"><%= community.active_proposals.count %></div>
+          <div class="stat-label">Active</div>
+        </div>
+        <div>
+          <div class="stat-value"><%= community.laws.count %></div>
+          <div class="stat-label">Laws</div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+<% else %>
+  <div class="card empty-state">
+    <h3>No communities yet</h3>
+    <p>Create your first community or join one below.</p>
+  </div>
+<% end %>
+
+<% if @other_communities.any? %>
+  <h2 style="margin: 2rem 0 1rem;">Explore Communities</h2>
+  <% @other_communities.each do |community| %>
+    <div class="card community-card">
+      <div class="community-info">
+        <h3><a href="<%= community_path(community) %>"><%= community.name %></a></h3>
+        <p class="community-meta">
+          <%= community.category.titleize %> &middot;
+          <%= community.member_count %> members &middot;
+          <%= community.consensus_threshold %>% consensus threshold
+        </p>
+        <% if community.description.present? %>
+          <p style="margin-top: 0.5rem; color: var(--text-muted);"><%= truncate(community.description, length: 150) %></p>
+        <% end %>
+      </div>
+      <div class="community-stats">
+        <div>
+          <div class="stat-value"><%= community.active_proposals.count %></div>
+          <div class="stat-label">Active</div>
+        </div>
+        <div>
+          <div class="stat-value"><%= community.laws.count %></div>
+          <div class="stat-label">Laws</div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+<% end %>

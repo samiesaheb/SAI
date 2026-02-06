@@ -1,0 +1,35 @@
+<div style="max-width: 800px;">
+  <p class="community-meta" style="margin-bottom: 0.5rem;">
+    <a href="<%= community_path(@community) %>"><%= @community.name %></a> &rsaquo;
+    <a href="<%= community_laws_path(@community) %>">Laws</a>
+  </p>
+
+  <div class="page-header">
+    <h1 class="page-title"><%= @law.title %></h1>
+    <span class="status-badge status-passed">Law v<%= @law.version %></span>
+  </div>
+
+  <div class="card law-card law-card-with-votes">
+    <%= render "shared/law_votes", law: @law, community: @community %>
+    <div class="law-content" style="flex: 1;">
+      <p class="proposal-meta" style="margin-bottom: 1rem;">
+        Passed on <%= @law.formatted_passed_at %> &middot;
+        <span class="vote-summary"><%= @law.upvotes %> support / <%= @law.downvotes %> oppose</span>
+      </p>
+
+      <div class="proposal-body"><%= @law.body %></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top: 1.5rem;">
+    <h3 style="margin-bottom: 0.75rem;">Origin</h3>
+    <p style="color: var(--text-muted);">
+      This law was created from
+      <a href="<%= community_proposal_path(@community, @law.proposal) %>">
+        Proposal #<%= @law.proposal.id %>
+      </a>
+      which passed with <%= @law.proposal.yes_percentage %>% approval
+      from <%= @law.proposal.total_votes %> voters.
+    </p>
+  </div>
+</div>

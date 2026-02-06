@@ -1,0 +1,64 @@
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Proposals</h1>
+    <p class="community-meta"><a href="<%= community_path(@community) %>"><%= @community.name %></a></p>
+  </div>
+  <a href="<%= new_community_proposal_path(@community) %>" class="btn btn-primary">New Proposal</a>
+</div>
+
+<h2 style="margin-bottom: 1rem;">Active Proposals</h2>
+<% if @active_proposals.any? %>
+  <% @active_proposals.each do |proposal| %>
+    <div class="card proposal-card">
+      <div class="proposal-header">
+        <h3 class="proposal-title">
+          <a href="<%= community_proposal_path(@community, proposal) %>"><%= proposal.title %></a>
+        </h3>
+        <span class="status-badge status-voting">Voting</span>
+      </div>
+      <p class="proposal-meta">
+        by <%= proposal.author.display_name_or_username %> &middot;
+        <%= time_ago_in_words(proposal.voting_ends_at) %> left &middot;
+        <%= proposal.total_votes %> votes
+      </p>
+      <div class="vote-progress" style="margin-top: 1rem;">
+        <div class="progress-label">
+          <span>Yes: <%= proposal.yes_percentage %>%</span>
+          <span>Threshold: <%= @community.consensus_threshold %>%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill yes" style="width: <%= proposal.yes_percentage %>%;"></div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+<% else %>
+  <div class="card empty-state">
+    <h3>No active proposals</h3>
+    <p>Submit a new proposal to get things started.</p>
+  </div>
+<% end %>
+
+<h2 style="margin: 2rem 0 1rem;">Past Proposals</h2>
+<% if @ended_proposals.any? %>
+  <% @ended_proposals.each do |proposal| %>
+    <div class="card proposal-card <%= proposal.status %>">
+      <div class="proposal-header">
+        <h3 class="proposal-title">
+          <a href="<%= community_proposal_path(@community, proposal) %>"><%= proposal.title %></a>
+        </h3>
+        <span class="status-badge status-<%= proposal.status %>"><%= proposal.status.capitalize %></span>
+      </div>
+      <p class="proposal-meta">
+        by <%= proposal.author.display_name_or_username %> &middot;
+        <%= proposal.total_votes %> votes &middot;
+        <%= proposal.yes_percentage %>% yes
+      </p>
+    </div>
+  <% end %>
+<% else %>
+  <div class="card empty-state">
+    <h3>No past proposals</h3>
+    <p>Completed proposals will appear here.</p>
+  </div>
+<% end %>

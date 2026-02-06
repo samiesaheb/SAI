@@ -1,0 +1,11 @@
+<%= turbo_stream.replace "meme-vote-inline-#{@meme.id}" do %>
+  <div class="meme-vote-inline" id="meme-vote-inline-<%= @meme.id %>">
+    <%= render "shared/meme_votes_inline", meme: @meme, community: @community %>
+  </div>
+<% end %>
+
+<%= turbo_stream.replace "meme-vote-large-#{@meme.id}" do %>
+  <div class="meme-vote-large" id="meme-vote-large-<%= @meme.id %>">
+    <%= render "shared/meme_votes_large", meme: @meme, community: @community %>
+  </div>
+<% end %>

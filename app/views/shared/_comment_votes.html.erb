@@ -1,0 +1,38 @@
+<% user_vote = comment.user_vote(current_user) if logged_in? %>
+<div class="vote-inline-controls">
+  <% if logged_in? %>
+    <% if commentable.is_a?(Post) %>
+      <%= form_with url: community_post_comment_comment_vote_path(community, commentable, comment), method: :post do %>
+        <input type="hidden" name="value" value="1">
+        <button type="submit" class="vote-arrow up <%= 'active' if user_vote&.upvote? %>" title="Upvote"></button>
+      <% end %>
+    <% else %>
+      <%= form_with url: community_meme_comment_comment_vote_path(community, commentable, comment), method: :post do %>
+        <input type="hidden" name="value" value="1">
+        <button type="submit" class="vote-arrow up <%= 'active' if user_vote&.upvote? %>" title="Upvote"></button>
+      <% end %>
+    <% end %>
+  <% else %>
+    <a href="<%= login_path %>" class="vote-arrow up" title="Log in to vote"></a>
+  <% end %>
+
+  <span class="vote-count <%= 'positive' if comment.score > 0 %><%= 'negative' if comment.score < 0 %>">
+    <%= comment.score %>
+  </span>
+
+  <% if logged_in? %>
+    <% if commentable.is_a?(Post) %>
+      <%= form_with url: community_post_comment_comment_vote_path(community, commentable, comment), method: :post do %>
+        <input type="hidden" name="value" value="-1">
+        <button type="submit" class="vote-arrow down <%= 'active' if user_vote&.downvote? %>" title="Downvote"></button>
+      <% end %>
+    <% else %>
+      <%= form_with url: community_meme_comment_comment_vote_path(community, commentable, comment), method: :post do %>
+        <input type="hidden" name="value" value="-1">
+        <button type="submit" class="vote-arrow down <%= 'active' if user_vote&.downvote? %>" title="Downvote"></button>
+      <% end %>
+    <% end %>
+  <% else %>
+    <a href="<%= login_path %>" class="vote-arrow down" title="Log in to vote"></a>
+  <% end %>
+</div>

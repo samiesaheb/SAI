@@ -1,0 +1,27 @@
+<%= turbo_stream.replace "voting-section" do %>
+  <div class="voting-section" id="voting-section">
+    <h3>Cast Your Vote</h3>
+    <div id="vote-error"></div>
+
+    <div class="vote-buttons">
+      <%= form_with url: community_proposal_votes_path(@community, @proposal), method: :post, data: { turbo: true } do |f| %>
+        <input type="hidden" name="value" value="yes">
+        <button type="submit" class="vote-btn yes <%= 'selected' if @vote.yes? %>">Yes</button>
+      <% end %>
+
+      <%= form_with url: community_proposal_votes_path(@community, @proposal), method: :post, data: { turbo: true } do |f| %>
+        <input type="hidden" name="value" value="no">
+        <button type="submit" class="vote-btn no <%= 'selected' if @vote.no? %>">No</button>
+      <% end %>
+
+      <%= form_with url: community_proposal_votes_path(@community, @proposal), method: :post, data: { turbo: true } do |f| %>
+        <input type="hidden" name="value" value="abstain">
+        <button type="submit" class="vote-btn abstain <%= 'selected' if @vote.abstain? %>">Abstain</button>
+      <% end %>
+    </div>
+
+    <p style="color: var(--text-muted); font-size: 0.875rem;">
+      You voted: <strong><%= @vote.value.capitalize %></strong>. You can change your vote until voting ends.
+    </p>
+  </div>
+<% end %>

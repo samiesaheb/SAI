@@ -1,0 +1,16 @@
+<% user_vote = law.user_vote(current_user) if logged_in? %>
+<div class="law-vote-controls" id="law-vote-<%= law.id %>">
+  <%= form_with url: community_law_law_votes_path(community, law), method: :post, data: { turbo: true } do %>
+    <input type="hidden" name="value" value="1">
+    <button type="submit" class="vote-triangle up <%= 'active' if user_vote&.upvote? %>" title="Support this law"></button>
+  <% end %>
+
+  <span class="vote-score <%= 'positive' if law.score > 0 %><%= 'negative' if law.score < 0 %>">
+    <%= law.score %>
+  </span>
+
+  <%= form_with url: community_law_law_votes_path(community, law), method: :post, data: { turbo: true } do %>
+    <input type="hidden" name="value" value="-1">
+    <button type="submit" class="vote-triangle down <%= 'active' if user_vote&.downvote? %>" title="Oppose this law"></button>
+  <% end %>
+</div>

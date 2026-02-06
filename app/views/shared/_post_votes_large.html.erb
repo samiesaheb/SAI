@@ -1,0 +1,37 @@
+<% user_vote = post.user_vote(current_user) if logged_in? %>
+<div class="vote-large-controls">
+  <% if logged_in? %>
+    <%= form_with url: community_post_post_votes_path(community, post), method: :post, data: { turbo: true } do %>
+      <input type="hidden" name="value" value="1">
+      <button type="submit" class="vote-btn-large up <%= 'active' if user_vote&.upvote? %>" title="Upvote"></button>
+    <% end %>
+  <% else %>
+    <a href="<%= login_path %>" class="vote-btn-large up" title="Log in to vote"></a>
+  <% end %>
+
+  <div class="vote-score-large <%= 'positive' if post.score > 0 %><%= 'negative' if post.score < 0 %>">
+    <%= post.score %>
+    <span class="vote-label">points</span>
+  </div>
+
+  <% if logged_in? %>
+    <%= form_with url: community_post_post_votes_path(community, post), method: :post, data: { turbo: true } do %>
+      <input type="hidden" name="value" value="-1">
+      <button type="submit" class="vote-btn-large down <%= 'active' if user_vote&.downvote? %>" title="Downvote"></button>
+    <% end %>
+  <% else %>
+    <a href="<%= login_path %>" class="vote-btn-large down" title="Log in to vote"></a>
+  <% end %>
+
+  <% if post.status == "approved" %>
+    <p class="canon-progress">
+      <%= post.score %>/<%= Post::CANON_THRESHOLD %> to canon
+    </p>
+  <% end %>
+
+  <% unless logged_in? %>
+    <p class="login-prompt" style="font-size: 0.875rem; color: var(--text-muted); margin-top: 0.5rem;">
+      <a href="<%= login_path %>">Log in</a> to vote
+    </p>
+  <% end %>
+</div>

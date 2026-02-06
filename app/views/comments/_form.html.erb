@@ -1,0 +1,18 @@
+<% form_url = commentable.is_a?(Post) ? community_post_comments_path(community, commentable) : community_meme_comments_path(community, commentable) %>
+<div class="x-compose">
+  <div class="x-compose-avatar">
+    <div class="x-avatar"><%= current_user.display_name_or_username[0].upcase %></div>
+  </div>
+  <div class="x-compose-input">
+    <%= form_with url: form_url, method: :post, class: "x-compose-form" do %>
+      <% if defined?(parent_id) && parent_id.present? %>
+        <input type="hidden" name="comment[parent_id]" value="<%= parent_id %>">
+      <% end %>
+      <textarea name="comment[body]" placeholder="Post your reply..." rows="1" class="x-compose-textarea" required maxlength="2000" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+      <div class="x-compose-footer">
+        <span class="x-compose-hint">2000 char max</span>
+        <button type="submit" class="x-compose-btn">Reply</button>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,71 @@
+<div style="max-width: 700px;">
+  <p class="community-meta" style="margin-bottom: 0.5rem;">
+    <a href="<%= community_path(@community) %>"><%= @community.name %></a> &rsaquo;
+    <a href="<%= community_posts_path(@community) %>">Posts</a>
+  </p>
+
+  <div class="page-header">
+    <h1 class="page-title">New Post</h1>
+  </div>
+
+  <% if @post.errors.any? %>
+    <div class="error-messages">
+      <h4><%= pluralize(@post.errors.count, "error") %> prevented publishing:</h4>
+      <ul>
+        <% @post.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="card">
+    <%= form_with model: [@community, @post] do |f| %>
+      <div class="form-group">
+        <%= f.label :title %>
+        <%= f.text_field :title, required: true, placeholder: "Give your post a compelling title", maxlength: 200 %>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :category %>
+        <%= f.select :category, Post::CATEGORIES.map { |c| [Post.new(category: c).category_label, c] }, { prompt: "Select a category" }, required: true %>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :body, "Content" %>
+        <%= f.text_area :body, required: true, placeholder: "Write your post here... (maximum #{Post::MAX_CHAR_COUNT} characters)", rows: 15, style: "min-height: 300px;", maxlength: Post::MAX_CHAR_COUNT %>
+        <p class="form-hint">Maximum <%= Post::MAX_CHAR_COUNT %> characters. Your post will be automatically analyzed for quality and categorized by our ML system.</p>
+      </div>
+
+      <div class="form-group">
+        <label>Sources & Citations (optional)</label>
+        <p class="form-hint" style="margin-bottom: 0.75rem;">Adding sources improves your quality score.</p>
+        <div id="sources-container">
+          <% 3.times do |i| %>
+            <div class="source-fields">
+              <input type="text" name="post[sources_list][][title]" placeholder="Source title" class="source-input">
+              <input type="url" name="post[sources_list][][url]" placeholder="https://..." class="source-input">
+              <input type="text" name="post[sources_list][][author]" placeholder="Author (optional)" class="source-input">
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="card" style="background: var(--bg); margin-bottom: 1.5rem;">
+        <h4 style="font-size: 0.875rem; margin-bottom: 0.5rem;">How Canon Works</h4>
+        <ul style="font-size: 0.875rem; color: var(--text-muted); margin-left: 1.25rem;">
+          <li>Your post starts with 0 points</li>
+          <li>Community members can upvote or downvote</li>
+          <li>Votes are weighted by voter reputation</li>
+          <li>Reach <strong><%= Post::CANON_THRESHOLD %> weighted points</strong> to achieve Canon status</li>
+          <li>Canon posts are preserved as community doctrine</li>
+        </ul>
+      </div>
+
+      <div style="display: flex; gap: 0.5rem;">
+        <%= f.submit "Publish Post", class: "btn btn-primary" %>
+        <a href="<%= community_posts_path(@community) %>" class="btn btn-secondary">Cancel</a>
+      </div>
+    <% end %>
+  </div>
+</div>

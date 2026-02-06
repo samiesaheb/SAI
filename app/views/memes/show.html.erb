@@ -1,0 +1,75 @@
+<div style="max-width: 900px;">
+  <p class="community-meta" style="margin-bottom: 0.5rem;">
+    <a href="<%= community_path(@community) %>"><%= @community.name %></a> &rsaquo;
+    <a href="<%= community_memes_path(@community) %>">Memes</a>
+  </p>
+
+  <div class="meme-show">
+    <div class="meme-show-image">
+      <% if @meme.image.attached? %>
+        <%= image_tag @meme.image, class: "meme-full-image", alt: @meme.title %>
+      <% else %>
+        <div class="meme-placeholder-large">No Image Available</div>
+      <% end %>
+    </div>
+
+    <div class="meme-show-sidebar">
+      <div class="meme-vote-large" id="meme-vote-large-<%= @meme.id %>">
+        <%= render "shared/meme_votes_large", meme: @meme, community: @community %>
+      </div>
+
+      <h1 class="meme-title"><%= @meme.title %></h1>
+
+      <div class="meme-badges">
+        <span class="category-badge"><%= @meme.category_label %></span>
+        <% if @meme.canon? %>
+          <span class="status-badge status-passed">📜 Canon</span>
+        <% end %>
+      </div>
+
+      <p class="meme-meta-info">
+        Uploaded by <%= @meme.author.display_name_or_username %><br>
+        <%= time_ago_in_words(@meme.created_at) %> ago
+      </p>
+
+      <% if @meme.canon? %>
+        <div class="canon-info">
+          <strong>Achieved Canon Status</strong><br>
+          <%= @meme.canon_at.strftime("%B %d, %Y") %>
+        </div>
+      <% end %>
+
+      <% if @meme.locked? %>
+        <div class="lock-info">
+          🔒 Locked for <%= @meme.blocks_until_unlock %> more blocks
+        </div>
+      <% end %>
+
+      <div class="meme-actions">
+        <% if @meme.author == current_user || current_user.admin_of?(@community) %>
+          <%= button_to "Delete", community_meme_path(@community, @meme), method: :delete, class: "btn btn-danger btn-small", data: { confirm: "Delete this meme?" } %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="comments-section">
+    <h2 class="comments-header">Comments (<%= @meme.comments.count %>)</h2>
+
+    <% if logged_in? && @is_member %>
+      <%= render "comments/form", community: @community, commentable: @meme %>
+    <% elsif !logged_in? %>
+      <p class="comment-login-prompt"><a href="<%= login_path %>">Log in</a> to comment.</p>
+    <% end %>
+
+    <div class="comments-list">
+      <% if @comments.any? %>
+        <% @comments.each do |comment| %>
+          <%= render "comments/comment", comment: comment, community: @community, commentable: @meme %>
+        <% end %>
+      <% else %>
+        <p class="comments-empty">No comments yet. Be the first to share your thoughts!</p>
+      <% end %>
+    </div>
+  </div>
+</div>

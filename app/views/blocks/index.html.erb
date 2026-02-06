@@ -1,0 +1,28 @@
+<div class="page-header">
+  <h1 class="page-title">⛓️ Block Explorer</h1>
+</div>
+
+<div class="current-block-card">
+  <div class="block-height">Block #<%= @current_block.height %></div>
+  <div class="block-hash"><%= @current_block.short_hash %>...</div>
+  <div class="block-time"><%= @current_block.formatted_timestamp %></div>
+  <p class="block-info">New block every ~10 minutes</p>
+</div>
+
+<h2 style="margin: 2rem 0 1rem;">Recent Blocks</h2>
+
+<div class="blocks-list">
+  <% @recent_blocks.each do |block| %>
+    <div class="block-row">
+      <div class="block-row-height">
+        <a href="<%= block_path(block.height) %>">#<%= block.height %></a>
+      </div>
+      <div class="block-row-hash">
+        <code><%= block.hash_value[0..31] %>...</code>
+      </div>
+      <div class="block-row-time">
+        <%= time_ago_in_words(block.timestamp) %> ago
+      </div>
+    </div>
+  <% end %>
+</div>
