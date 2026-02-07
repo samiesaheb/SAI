@@ -17,7 +17,7 @@
         <span class="status-badge status-voting">Voting</span>
       </div>
       <p class="proposal-meta">
-        by <%= proposal.author.display_name_or_username %> &middot;
+        by <a href="<%= user_path(username: proposal.author.username) %>" class="profile-link"><%= proposal.author.display_name_or_username %></a> &middot;
         <%= time_ago_in_words(proposal.voting_ends_at) %> left &middot;
         <%= proposal.total_votes %> votes
       </p>
@@ -50,7 +50,7 @@
         <span class="status-badge status-<%= proposal.status %>"><%= proposal.status.capitalize %></span>
       </div>
       <p class="proposal-meta">
-        by <%= proposal.author.display_name_or_username %> &middot;
+        by <a href="<%= user_path(username: proposal.author.username) %>" class="profile-link"><%= proposal.author.display_name_or_username %></a> &middot;
         <%= proposal.total_votes %> votes &middot;
         <%= proposal.yes_percentage %>% yes
       </p>

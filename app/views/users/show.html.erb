@@ -1,0 +1,65 @@
+<div class="profile-header">
+  <div class="profile-avatar"><%= @user.display_name_or_username[0].upcase %></div>
+  <div>
+    <h1 class="page-title"><%= @user.display_name_or_username %></h1>
+    <p class="community-meta">@<%= @user.username %> &middot; Member since <%= @user.created_at.strftime("%B %Y") %></p>
+  </div>
+</div>
+
+<div class="profile-stats">
+  <a href="#communities" class="profile-stat">
+    <span class="stat-value"><%= @stats[:communities] %></span>
+    <span class="stat-label">Communities</span>
+  </a>
+  <a href="#posts" class="profile-stat">
+    <span class="stat-value"><%= @stats[:posts] %></span>
+    <span class="stat-label">Posts</span>
+  </a>
+  <a href="#memes" class="profile-stat">
+    <span class="stat-value"><%= @stats[:memes] %></span>
+    <span class="stat-label">Memes</span>
+  </a>
+  <div class="profile-stat">
+    <span class="stat-value"><%= @stats[:proposals] %></span>
+    <span class="stat-label">Proposals</span>
+  </div>
+</div>
+
+<% if @memberships.any? %>
+  <h2 id="communities" style="margin: 2rem 0 1rem;">Communities</h2>
+  <div class="profile-communities">
+    <% @memberships.each do |membership| %>
+      <a href="<%= community_path(membership.community) %>" class="card profile-community-card">
+        <div>
+          <h3 style="margin-bottom: 0.25rem;"><%= membership.community.name %></h3>
+          <p class="community-meta">
+            Joined <%= time_ago_in_words(membership.created_at) %> ago
+          </p>
+        </div>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+          <span class="rep-badge <%= membership.reputation_level %>"><%= membership.level_emoji %> <%= membership.reputation_level.titleize %></span>
+          <span style="font-size: 0.875rem; color: var(--text-muted);"><%= membership.reputation %> rep</span>
+          <span style="font-size: 0.875rem; color: var(--primary); font-weight: 600;"><%= membership.vote_weight %>x vote</span>
+        </div>
+      </a>
+    <% end %>
+  </div>
+<% end %>
+
+<% if @recent_posts.any? %>
+  <h2 id="posts" style="margin: 2rem 0 1rem;">Recent Posts</h2>
+  <div class="post-list">
+    <% @recent_posts.each do |post| %>
+      <%= render "posts/post_card", post: post, community: post.community %>
+    <% end %>
+  </div>
+<% end %>
+
+<% if @recent_memes.any? %>
+  <h2 id="memes" style="margin: 2rem 0 1rem;">Recent Memes</h2>
+  <div class="meme-grid">
+    <% @recent_memes.each do |meme| %>
+      <%= render "memes/meme_card", meme: meme, community: meme.community %>
+    <% end %>
+  </div>
+<% end %>

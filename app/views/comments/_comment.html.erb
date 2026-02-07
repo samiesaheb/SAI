@@ -7,8 +7,8 @@
   </div>
   <div class="x-comment-body-col">
     <div class="x-comment-header">
-      <span class="x-display-name"><%= comment.author.display_name_or_username %></span>
-      <span class="x-handle">@<%= comment.author.username %></span>
+      <a href="<%= user_path(username: comment.author.username) %>" class="x-display-name profile-link"><%= comment.author.display_name_or_username %></a>
+      <a href="<%= user_path(username: comment.author.username) %>" class="x-handle profile-link">@<%= comment.author.username %></a>
       <span class="x-separator">&middot;</span>
       <span class="x-timestamp"><%= time_ago_in_words(comment.created_at) %></span>
     </div>

@@ -11,7 +11,7 @@
 
   <div class="card">
     <p class="proposal-meta" style="margin-bottom: 1rem;">
-      Proposed by <%= @proposal.author.display_name_or_username %> &middot;
+      Proposed by <a href="<%= user_path(username: @proposal.author.username) %>" class="profile-link"><%= @proposal.author.display_name_or_username %></a> &middot;
       Created <%= time_ago_in_words(@proposal.created_at) %> ago
       <% if @proposal.voting_active? %>
         &middot; <span class="time-remaining"><%= time_ago_in_words(@proposal.voting_ends_at) %> left to vote</span>

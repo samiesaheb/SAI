@@ -34,9 +34,9 @@
     <div class="search-section">
       <h2 style="margin-bottom: 1rem;">Communities</h2>
       <% @communities.each do |community| %>
-        <div class="card community-card">
+        <a href="<%= community_path(community) %>" class="card community-card clickable-card">
           <div class="community-info">
-            <h3><a href="<%= community_path(community) %>"><%= community.name %></a></h3>
+            <h3><%= community.name %></h3>
             <p class="community-meta">
               <%= community.category.titleize %> &middot;
               <%= community.member_count %> members &middot;
@@ -56,7 +56,7 @@
               <div class="stat-label">Laws</div>
             </div>
           </div>
-        </div>
+        </a>
       <% end %>
     </div>
   <% end %>

@@ -37,7 +37,7 @@
           <a href="<%= root_path %>" class="logo">Common Consensus</a>
           <div class="navbar-user">
             <% if logged_in? %>
-              <span class="user-info"><%= current_user.display_name_or_username %></span>
+              <a href="<%= user_path(username: current_user.username) %>" class="user-info profile-link"><%= current_user.display_name_or_username %></a>
               <%= button_to "Logout", logout_path, method: :delete, class: "btn btn-secondary btn-small" %>
             <% else %>
               <a href="<%= login_path %>" class="btn btn-secondary btn-small">Login</a>

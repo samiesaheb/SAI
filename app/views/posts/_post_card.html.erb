@@ -1,28 +1,39 @@
-<div class="post-card <%= 'canon' if post.canon? %>">
-  <div class="post-card-content">
-    <div class="post-vote-inline" id="post-vote-inline-<%= post.id %>">
+<a href="<%= community_post_path(community, post) %>" class="post-card clickable-card <%= 'canon' if post.canon? %> <%= 'locked' if post.locked? %>">
+  <div class="post-card-accent"></div>
+  <div class="post-card-inner">
+    <div class="post-vote-inline" id="post-vote-inline-<%= post.id %>" onclick="event.stopPropagation();">
       <%= render "shared/post_votes_inline", post: post, community: community %>
     </div>
     <div class="post-card-info">
-      <h3><a href="<%= community_post_path(community, post) %>"><%= post.title %></a></h3>
-      <p class="post-card-meta">
-        <span class="meme-category"><%= post.category_label %></span>
+      <div class="post-card-badges">
+        <span class="post-category-pill"><%= post.category_label %></span>
         <% if post.canon? %>
-          <span class="canon-badge">📜 Canon</span>
+          <span class="post-canon-pill">Canon</span>
+        <% end %>
+        <% if post.locked? %>
+          <span class="post-locked-pill">Locked</span>
         <% end %>
         <% if post.quality_score > 0 %>
-          <span class="quality-badge quality-<%= post.quality_score >= 70 ? 'high' : post.quality_score >= 40 ? 'medium' : 'low' %>">
-            Q: <%= post.quality_score %>
+          <span class="post-quality-pill quality-<%= post.quality_score >= 70 ? 'high' : post.quality_score >= 40 ? 'medium' : 'low' %>">
+            Q:<%= post.quality_score %>
           </span>
         <% end %>
-        <span class="post-word-count"><%= post.word_count %> words</span>
-      </p>
-      <p class="post-card-excerpt"><%= truncate(post.body, length: 200) %></p>
-      <p class="post-card-author">
-        by <%= post.author.display_name_or_username %>
-        in <a href="<%= community_path(community) %>" style="color: var(--primary);"><%= community.name %></a> &middot;
-        <%= time_ago_in_words(post.created_at) %> ago
-      </p>
+      </div>
+      <h3 class="post-card-title"><%= post.title %></h3>
+      <p class="post-card-excerpt"><%= truncate(post.body, length: 180) %></p>
+      <div class="post-card-footer">
+        <div class="post-card-author-row">
+          <span class="post-card-avatar" onclick="event.preventDefault(); window.location='<%= user_path(username: post.author.username) %>';">
+            <%= post.author.display_name_or_username[0].upcase %>
+          </span>
+          <span class="post-card-byline">
+            <span class="profile-link" onclick="event.preventDefault(); window.location='<%= user_path(username: post.author.username) %>';"><%= post.author.display_name_or_username %></span>
+            in
+            <span class="post-card-community" onclick="event.preventDefault(); window.location='<%= community_path(community) %>';"><%= community.name %></span>
+          </span>
+        </div>
+        <span class="post-card-time"><%= time_ago_in_words(post.created_at) %> ago</span>
+      </div>
     </div>
   </div>
-</div>
+</a>

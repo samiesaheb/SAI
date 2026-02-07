@@ -5,22 +5,22 @@
       <% if activity.trackable.present? %>
         <% case activity.action
            when "post_created", "post_canon" %>
-          <strong><%= activity.user.username %></strong>
+          <a href="<%= user_path(username: activity.user.username) %>" class="profile-link"><strong><%= activity.user.username %></strong></a>
           <%= activity.action == "post_created" ? "created" : "achieved canon with" %>
           <a href="<%= trackable_path(activity) %>"><%= activity.trackable.title %></a>
         <% when "meme_created", "meme_canon" %>
-          <strong><%= activity.user.username %></strong>
+          <a href="<%= user_path(username: activity.user.username) %>" class="profile-link"><strong><%= activity.user.username %></strong></a>
           <%= activity.action == "meme_created" ? "shared" : "achieved canon with" %>
           <a href="<%= trackable_path(activity) %>"><%= activity.trackable.title %></a>
         <% when "proposal_created" %>
-          <strong><%= activity.user.username %></strong> submitted
+          <a href="<%= user_path(username: activity.user.username) %>" class="profile-link"><strong><%= activity.user.username %></strong></a> submitted
           <a href="<%= trackable_path(activity) %>"><%= activity.trackable.title %></a>
         <% when "proposal_passed" %>
           <a href="<%= trackable_path(activity) %>"><%= activity.trackable.title %></a> passed
         <% when "proposal_failed" %>
           <a href="<%= trackable_path(activity) %>"><%= activity.trackable.title %></a> failed
         <% when "user_joined" %>
-          <strong><%= activity.user.username %></strong> joined
+          <a href="<%= user_path(username: activity.user.username) %>" class="profile-link"><strong><%= activity.user.username %></strong></a> joined
         <% else %>
           <%= activity.description %>
         <% end %>

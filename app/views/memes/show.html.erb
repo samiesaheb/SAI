@@ -28,7 +28,7 @@
       </div>
 
       <p class="meme-meta-info">
-        Uploaded by <%= @meme.author.display_name_or_username %><br>
+        Uploaded by <a href="<%= user_path(username: @meme.author.username) %>" class="profile-link"><%= @meme.author.display_name_or_username %></a><br>
         <%= time_ago_in_words(@meme.created_at) %> ago
       </p>
 

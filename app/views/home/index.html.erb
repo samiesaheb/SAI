@@ -20,9 +20,9 @@
       <h2 style="margin-bottom: 1rem;">Your Communities</h2>
       <% if @my_communities.any? %>
         <% @my_communities.each do |community| %>
-          <div class="card community-card">
+          <a href="<%= community_path(community) %>" class="card community-card clickable-card">
             <div class="community-info">
-              <h3><a href="<%= community_path(community) %>"><%= community.name %></a></h3>
+              <h3><%= community.name %></h3>
               <p class="community-meta"><%= community.category.titleize %> &middot; <%= community.member_count %> members</p>
             </div>
             <div class="community-stats">
@@ -35,7 +35,7 @@
                 <div class="stat-label">Laws</div>
               </div>
             </div>
-          </div>
+          </a>
         <% end %>
       <% else %>
         <div class="card empty-state">
@@ -47,9 +47,9 @@
       <% if @other_communities.any? %>
         <h2 style="margin: 2rem 0 1rem;">Explore Communities</h2>
         <% @other_communities.each do |community| %>
-          <div class="card community-card">
+          <a href="<%= community_path(community) %>" class="card community-card clickable-card">
             <div class="community-info">
-              <h3><a href="<%= community_path(community) %>"><%= community.name %></a></h3>
+              <h3><%= community.name %></h3>
               <p class="community-meta"><%= community.category.titleize %> &middot; <%= community.member_count %> members</p>
             </div>
             <div class="community-stats">
@@ -62,7 +62,7 @@
                 <div class="stat-label">Laws</div>
               </div>
             </div>
-          </div>
+          </a>
         <% end %>
       <% end %>
     </div>

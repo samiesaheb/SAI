@@ -22,6 +22,19 @@ class UsersController < ApplicationController
     end
   end
 
+  def show
+    @user = User.find_by!(username: params[:username])
+    @memberships = @user.memberships.includes(:community).by_reputation
+    @recent_posts = @user.posts.includes(:community).order(created_at: :desc).limit(5)
+    @recent_memes = @user.memes.includes(:community, image_attachment: :blob).order(created_at: :desc).limit(6)
+    @stats = {
+      communities: @user.memberships.count,
+      posts: @user.posts.count,
+      memes: @user.memes.count,
+      proposals: @user.proposals.count
+    }
+  end
+
   private
 
   def user_params

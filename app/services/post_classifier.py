@@ -133,33 +133,33 @@ def classify_category(text):
 def calculate_quality_score(text):
     """
     Calculate a quality score (0-100) based on multiple text features:
-    - Word count contribution (up to 20 points)
-    - Paragraph structure (up to 15 points)
+    - Word count contribution (up to 5 points)
+    - Paragraph structure (up to 20 points)
     - Source citations present (up to 20 points)
-    - Vocabulary diversity (up to 25 points)
-    - Sentence length variation (up to 20 points)
+    - Vocabulary diversity (up to 30 points)
+    - Sentence length variation (up to 25 points)
     """
     score = 0.0
     words = text.split()
     word_count = len(words)
 
-    # Word count (up to 20 points, peaks around 1000+ words)
+    # Word count (up to 5 points)
     if word_count >= 1000:
-        score += 20
+        score += 5
     elif word_count >= 300:
-        score += 5 + (word_count - 300) / 700 * 15
+        score += 2 + (word_count - 300) / 700 * 3
     else:
-        score += word_count / 300 * 5
+        score += word_count / 300 * 2
 
-    # Paragraph structure (up to 15 points)
+    # Paragraph structure (up to 20 points)
     paragraphs = [p.strip() for p in text.split('\n\n') if p.strip()]
     para_count = len(paragraphs)
     if para_count >= 5:
-        score += 15
+        score += 20
     elif para_count >= 3:
-        score += 10
+        score += 13
     elif para_count >= 2:
-        score += 5
+        score += 7
 
     # Source citations (up to 20 points)
     url_pattern = r'https?://[^\s]+'
@@ -179,15 +179,15 @@ def calculate_quality_score(text):
     elif citation_count >= 1:
         score += 8
 
-    # Vocabulary diversity (up to 25 points)
+    # Vocabulary diversity (up to 30 points)
     if word_count > 0:
         unique_words = len(set(w.lower().strip('.,!?;:"\'-()[]') for w in words))
         diversity = unique_words / word_count
         # Typical diversity ranges from 0.3 (repetitive) to 0.7+ (diverse)
-        diversity_score = min(25, max(0, (diversity - 0.3) / 0.4 * 25))
+        diversity_score = min(30, max(0, (diversity - 0.3) / 0.4 * 30))
         score += diversity_score
 
-    # Sentence length variation (up to 20 points)
+    # Sentence length variation (up to 25 points)
     sentences = re.split(r'[.!?]+', text)
     sentences = [s.strip() for s in sentences if s.strip()]
     if len(sentences) >= 3:
@@ -198,11 +198,11 @@ def calculate_quality_score(text):
             std_dev = math.sqrt(variance)
             # Good writing typically has std_dev between 5-15
             if 5 <= std_dev <= 20:
-                score += 20
+                score += 25
             elif 3 <= std_dev < 5 or 20 < std_dev <= 25:
-                score += 12
+                score += 15
             else:
-                score += 5
+                score += 6
 
     return round(min(100, max(0, score)), 1)
 

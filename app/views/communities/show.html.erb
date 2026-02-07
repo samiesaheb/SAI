@@ -74,7 +74,7 @@
             <span class="status-badge status-voting">Voting</span>
           </div>
           <p class="proposal-meta">
-            by <%= proposal.author.display_name_or_username %> &middot;
+            by <a href="<%= user_path(username: proposal.author.username) %>" class="profile-link"><%= proposal.author.display_name_or_username %></a> &middot;
             <%= time_ago_in_words(proposal.voting_ends_at) %> left
           </p>
           <div class="vote-progress" style="margin-top: 1rem;">

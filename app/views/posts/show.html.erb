@@ -1,24 +1,38 @@
-<div style="max-width: 900px;">
-  <p class="community-meta" style="margin-bottom: 0.5rem;">
-    <a href="<%= community_path(@community) %>"><%= @community.name %></a> &rsaquo;
+<div class="post-show-wrapper">
+  <nav class="post-breadcrumb">
+    <a href="<%= community_path(@community) %>"><%= @community.name %></a>
+    <span class="breadcrumb-sep">/</span>
     <a href="<%= community_posts_path(@community) %>">Posts</a>
-  </p>
+  </nav>
 
   <div class="post-show">
     <div class="post-show-content">
-      <h1 class="post-title"><%= @post.title %></h1>
-
-      <div class="post-show-meta">
-        <span class="category-badge"><%= @post.category_label %></span>
+      <div class="post-show-badges">
+        <span class="post-category-pill"><%= @post.category_label %></span>
         <% if @post.canon? %>
-          <span class="status-badge status-passed">📜 Canon</span>
+          <span class="post-canon-pill">Canon</span>
+        <% end %>
+        <% if @post.locked? %>
+          <span class="post-locked-pill">Locked</span>
         <% end %>
         <% if @post.quality_score > 0 %>
-          <span class="quality-badge quality-<%= @post.quality_score >= 70 ? 'high' : @post.quality_score >= 40 ? 'medium' : 'low' %>">
+          <span class="post-quality-pill quality-<%= @post.quality_score >= 70 ? 'high' : @post.quality_score >= 40 ? 'medium' : 'low' %>">
             Quality: <%= @post.quality_score %>
           </span>
         <% end %>
-        <span class="post-word-count"><%= @post.word_count %> words</span>
+        <span class="post-word-pill"><%= @post.word_count %> words</span>
+      </div>
+
+      <h1 class="post-title"><%= @post.title %></h1>
+
+      <div class="post-author-bar">
+        <div class="post-author-avatar">
+          <%= @post.author.display_name_or_username[0].upcase %>
+        </div>
+        <div class="post-author-details">
+          <a href="<%= user_path(username: @post.author.username) %>" class="profile-link post-author-name"><%= @post.author.display_name_or_username %></a>
+          <span class="post-author-time"><%= time_ago_in_words(@post.created_at) %> ago</span>
+        </div>
       </div>
 
       <div class="post-body">
@@ -52,11 +66,6 @@
       </div>
 
       <div class="post-sidebar-info">
-        <p class="meme-meta-info">
-          Written by <strong><%= @post.author.display_name_or_username %></strong><br>
-          <%= time_ago_in_words(@post.created_at) %> ago
-        </p>
-
         <% if @post.ml_category.present? && @post.ml_category != @post.category %>
           <div class="ml-info">
             <span class="ml-label">ML Suggested:</span> <%= @post.ml_category.titleize %>
@@ -80,7 +89,7 @@
 
         <% if @post.locked? %>
           <div class="lock-info">
-            🔒 Locked for <%= @post.locked_until_block - Block.current_height %> more blocks
+            Locked for <%= @post.locked_until_block - Block.current_height %> more blocks
           </div>
         <% end %>
 
