@@ -5,10 +5,10 @@ class ProposalsController < ApplicationController
   before_action :set_proposal, only: [:show, :edit, :update, :destroy]
 
   def index
-    @active_proposals = @community.proposals.active.includes(:author, :votes)
+    @active_proposals = @community.proposals.active.includes(:author, :votes, :memes)
     @ended_proposals = @community.proposals.where.not(status: "voting")
                                  .or(@community.proposals.ended)
-                                 .includes(:author, :votes)
+                                 .includes(:author, :votes, :memes)
                                  .order(voting_ends_at: :desc)
   end
 
@@ -19,6 +19,7 @@ class ProposalsController < ApplicationController
 
   def new
     @proposal = @community.proposals.build
+    @available_memes = @community.memes.where(status: %w[approved canon]).order(created_at: :desc)
   end
 
   def create
@@ -29,6 +30,7 @@ class ProposalsController < ApplicationController
       flash[:notice] = "Proposal submitted for voting!"
       redirect_to community_proposal_path(@community, @proposal)
     else
+      @available_memes = @community.memes.where(status: %w[approved canon]).order(created_at: :desc)
       render :new, status: :unprocessable_entity
     end
   end
@@ -36,13 +38,15 @@ class ProposalsController < ApplicationController
   def edit
     unless @proposal.author == current_user || current_user.admin_of?(@community)
       flash[:alert] = "You can only edit your own proposals."
-      redirect_to community_proposal_path(@community, @proposal)
+      redirect_to community_proposal_path(@community, @proposal) and return
     end
 
     unless @proposal.voting_active?
       flash[:alert] = "Cannot edit a proposal after voting has ended."
-      redirect_to community_proposal_path(@community, @proposal)
+      redirect_to community_proposal_path(@community, @proposal) and return
     end
+
+    @available_memes = @community.memes.where(status: %w[approved canon]).order(created_at: :desc)
   end
 
   def update
@@ -50,6 +54,7 @@ class ProposalsController < ApplicationController
       flash[:notice] = "Proposal updated."
       redirect_to community_proposal_path(@community, @proposal)
     else
+      @available_memes = @community.memes.where(status: %w[approved canon]).order(created_at: :desc)
       render :edit, status: :unprocessable_entity
     end
   end
@@ -83,6 +88,6 @@ class ProposalsController < ApplicationController
   end
 
   def proposal_params
-    params.require(:proposal).permit(:title, :body)
+    params.require(:proposal).permit(:title, :body, meme_ids: [])
   end
 end

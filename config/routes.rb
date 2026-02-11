@@ -21,7 +21,7 @@ Rails.application.routes.draw do
 
   # Communities and nested resources
   resources :communities, param: :slug do
-    resource :membership, only: [:create]
+    resource :membership, only: [:create, :destroy]
     resources :proposals do
       resources :votes, only: [:create]
     end

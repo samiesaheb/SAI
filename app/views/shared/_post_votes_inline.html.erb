@@ -16,7 +16,7 @@
   <% if logged_in? %>
     <%= form_with url: community_post_post_votes_path(community, post), method: :post, data: { turbo: true } do %>
       <input type="hidden" name="value" value="-1">
-      <button type="submit" class="vote-arrow down <%= 'active' if user_vote&.downvote? %>" title="Downvote"></button>
+      <button type="submit" class="vote-arrow down <%= 'active' if user_vote&.downvote? && post.score < 0 %>" title="Downvote"></button>
     <% end %>
   <% else %>
     <a href="<%= login_path %>" class="vote-arrow down" title="Log in to vote"></a>

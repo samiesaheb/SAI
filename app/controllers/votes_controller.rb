@@ -8,23 +8,21 @@ class VotesController < ApplicationController
     @vote = @proposal.votes.find_or_initialize_by(user: current_user)
     @vote.value = params[:value]
 
-    if @vote.save
-      respond_to do |format|
+    respond_to do |format|
+      if @vote.save
         format.html do
-          flash[:notice] = "Vote recorded: #{params[:value].capitalize}"
-          redirect_to community_proposal_path(@community, @proposal)
+          redirect_to community_proposal_path(@community, @proposal), 
+                      notice: "Vote recorded: #{params[:value].capitalize}"
         end
-        format.turbo_stream
-      end
-    else
-      respond_to do |format|
+        format.turbo_stream # Looks for create.turbo_stream.erb
+      else
         format.html do
-          flash[:alert] = @vote.errors.full_messages.join(", ")
-          redirect_to community_proposal_path(@community, @proposal)
+          redirect_to community_proposal_path(@community, @proposal), 
+                      alert: @vote.errors.full_messages.to_sentence
         end
         format.turbo_stream do
-          render turbo_stream: turbo_stream.replace("vote-error",
-            "<div id='vote-error' class='error'>#{@vote.errors.full_messages.join(', ')}</div>")
+          render turbo_stream: turbo_stream.update("vote-error", 
+                partial: "shared/errors", locals: { object: @vote })
         end
       end
     end

@@ -8,7 +8,7 @@ class MemesController < ApplicationController
     @category = params[:category]
     @memes = @community.memes.approved.or(@community.memes.canon)
     @memes = @memes.by_category(@category) if @category.present?
-    @memes = @memes.by_score.includes(:author, :meme_votes, image_attachment: :blob)
+    @memes = @memes.by_score.includes(:author, meme_votes: { user: :memberships }, image_attachment: :blob)
 
     @canon_memes = @community.memes.canon.by_category(@category.presence).by_score.limit(5)
   end
@@ -63,7 +63,7 @@ class MemesController < ApplicationController
   end
 
   def set_meme
-    @meme = @community.memes.find(params[:id])
+    @meme = @community.memes.includes(meme_votes: { user: :memberships }).find(params[:id])
   end
 
   def meme_params

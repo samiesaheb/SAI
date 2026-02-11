@@ -20,6 +20,24 @@
 
     <div class="proposal-body"><%= @proposal.body %></div>
 
+    <% if @proposal.memes.any? %>
+      <div class="proposal-memes">
+        <h3 class="proposal-memes-heading">Attached Memes</h3>
+        <div class="proposal-memes-grid">
+          <% @proposal.memes.each do |meme| %>
+            <a href="<%= community_meme_path(@community, meme) %>" class="proposal-meme-thumb">
+              <% if meme.image.attached? %>
+                <%= image_tag meme.image, class: "proposal-meme-img", alt: meme.title, loading: "lazy" %>
+              <% else %>
+                <div class="proposal-meme-img meme-placeholder">No Image</div>
+              <% end %>
+              <span class="proposal-meme-label"><%= truncate(meme.title, length: 50) %></span>
+            </a>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
     <% if @proposal.author == current_user && @proposal.voting_active? %>
       <div style="margin-top: 1.5rem; display: flex; gap: 0.5rem;">
         <a href="<%= edit_community_proposal_path(@community, @proposal) %>" class="btn btn-secondary btn-small">Edit</a>

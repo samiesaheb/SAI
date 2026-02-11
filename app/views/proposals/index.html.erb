@@ -19,7 +19,8 @@
       <p class="proposal-meta">
         by <a href="<%= user_path(username: proposal.author.username) %>" class="profile-link"><%= proposal.author.display_name_or_username %></a> &middot;
         <%= time_ago_in_words(proposal.voting_ends_at) %> left &middot;
-        <%= proposal.total_votes %> votes
+        <%= proposal.total_votes %> votes<% if proposal.memes.any? %>
+        &middot; <%= pluralize(proposal.memes.size, "meme") %><% end %>
       </p>
       <div class="vote-progress" style="margin-top: 1rem;">
         <div class="progress-label">
@@ -52,7 +53,8 @@
       <p class="proposal-meta">
         by <a href="<%= user_path(username: proposal.author.username) %>" class="profile-link"><%= proposal.author.display_name_or_username %></a> &middot;
         <%= proposal.total_votes %> votes &middot;
-        <%= proposal.yes_percentage %>% yes
+        <%= proposal.yes_percentage %>% yes<% if proposal.memes.any? %>
+        &middot; <%= pluralize(proposal.memes.size, "meme") %><% end %>
       </p>
     </div>
   <% end %>

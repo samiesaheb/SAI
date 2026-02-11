@@ -8,18 +8,20 @@ class MemeVotesController < ApplicationController
     @meme_vote = @meme.meme_votes.find_or_initialize_by(user: current_user)
     new_value = params[:value].to_i
 
-    # If already voted with same value, do nothing
     if @meme_vote.persisted? && @meme_vote.value == new_value
-      respond_to do |format|
-        format.html { redirect_to community_meme_path(@community, @meme) }
-        format.turbo_stream { head :ok }
-      end
-      return
+      # Toggle off: same button clicked again
+      @meme_vote.destroy
+    elsif @meme_vote.persisted?
+      # Switch vote direction
+      @meme_vote.update!(value: new_value)
+    else
+      # New vote
+      @meme_vote.value = new_value
+      @meme_vote.save!
     end
 
-    # Otherwise save the new vote (or update existing)
-    @meme_vote.value = new_value
-    @meme_vote.save
+    # Load a completely fresh meme with all vote data preloaded
+    @meme = Meme.includes(meme_votes: { user: :memberships }).find(@meme.id)
 
     respond_to do |format|
       format.html { redirect_to community_meme_path(@community, @meme) }

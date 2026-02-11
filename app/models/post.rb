@@ -84,6 +84,7 @@ class Post < ApplicationRecord
   end
 
   def check_canon!
+    post_votes.reset
     return unless status == "approved" && score >= CANON_THRESHOLD
     update!(status: "canon", canon_at: Time.current)
 

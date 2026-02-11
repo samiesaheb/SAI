@@ -31,6 +31,31 @@
         <%= f.text_area :body, required: true, rows: 10 %>
       </div>
 
+      <% if @available_memes.any? %>
+        <div class="form-group" data-controller="meme-picker">
+          <label>Attach Memes <span style="font-weight: 400; color: var(--text-muted);">(optional)</span></label>
+          <p class="form-hint">Select community memes to include with this proposal.</p>
+          <span class="form-hint" data-meme-picker-target="count" hidden></span>
+          <div class="meme-picker">
+            <% @available_memes.each do |meme| %>
+              <label class="meme-picker-item">
+                <input type="checkbox" name="proposal[meme_ids][]" value="<%= meme.id %>"
+                  data-action="change->meme-picker#update"
+                  <%= 'checked' if @proposal.meme_ids.include?(meme.id) %>>
+                <div class="meme-picker-card">
+                  <% if meme.image.attached? %>
+                    <%= image_tag meme.image, class: "meme-picker-img", alt: meme.title, loading: "lazy" %>
+                  <% else %>
+                    <div class="meme-picker-img meme-placeholder">No Image</div>
+                  <% end %>
+                  <span class="meme-picker-title"><%= truncate(meme.title, length: 40) %></span>
+                </div>
+              </label>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
       <div class="card" style="background: var(--bg); margin-bottom: 1.5rem;">
         <h4 style="font-size: 0.875rem; margin-bottom: 0.5rem;">Voting Rules</h4>
         <ul style="font-size: 0.875rem; color: var(--text-muted); margin-left: 1.25rem;">

@@ -9,15 +9,19 @@ class PostVotesController < ApplicationController
     new_value = params[:value].to_i
 
     if @post_vote.persisted? && @post_vote.value == new_value
-      respond_to do |format|
-        format.html { redirect_to community_post_path(@community, @post) }
-        format.turbo_stream { head :ok }
-      end
-      return
+      # Toggle off: same button clicked again
+      @post_vote.destroy
+    elsif @post_vote.persisted?
+      # Switch vote direction
+      @post_vote.update!(value: new_value)
+    else
+      # New vote
+      @post_vote.value = new_value
+      @post_vote.save!
     end
 
-    @post_vote.value = new_value
-    @post_vote.save
+    # Load a completely fresh post with all vote data preloaded
+    @post = Post.includes(post_votes: { user: :memberships }).find(@post.id)
 
     respond_to do |format|
       format.html { redirect_to community_post_path(@community, @post) }

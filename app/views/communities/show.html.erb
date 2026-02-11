@@ -14,6 +14,7 @@
       <% if current_user.admin_of?(@community) %>
         <a href="<%= edit_community_path(@community) %>" class="btn btn-secondary">Settings</a>
       <% end %>
+      <%= button_to "Leave Community", community_membership_path(@community), method: :delete, class: "btn btn-danger btn-small", data: { turbo_confirm: "Are you sure you want to leave #{@community.name}?" } %>
     </div>
   <% elsif logged_in? %>
     <%= button_to "Join Community", community_membership_path(@community), method: :post, class: "btn btn-primary" %>
@@ -59,11 +60,16 @@
 <% end %>
 
 <% @active_proposals = @community.active_proposals.includes(:author, :votes) %>
+<% @recent_memes = @community.memes.canon.or(@community.memes.approved).by_score.limit(4) %>
 <% @laws = @community.laws.by_date.limit(5) %>
+<% @recent_posts = @community.posts.canon.or(@community.posts.approved).by_score.limit(3) %>
 
 <div class="grid grid-2">
   <div>
-    <h2 style="margin-bottom: 1rem;">Active Proposals</h2>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+      <h2>Active Proposals</h2>
+      <a href="<%= community_proposals_path(@community) %>" class="btn btn-secondary btn-small">View All</a>
+    </div>
     <% if @active_proposals.any? %>
       <% @active_proposals.each do |proposal| %>
         <div class="card proposal-card">
@@ -94,11 +100,59 @@
         <p>Be the first to submit a proposal!</p>
       </div>
     <% end %>
-    <a href="<%= community_proposals_path(@community) %>" class="btn btn-secondary" style="margin-top: 0.5rem;">View All Proposals</a>
   </div>
 
   <div>
-    <h2 style="margin-bottom: 1rem;">Recent Laws</h2>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+      <h2>Meme Library</h2>
+      <a href="<%= community_memes_path(@community) %>" class="btn btn-secondary btn-small">View All</a>
+    </div>
+    <% if @recent_memes.any? %>
+      <div class="meme-grid" style="grid-template-columns: repeat(2, 1fr);">
+        <% @recent_memes.each do |meme| %>
+          <%= render "memes/meme_card", meme: meme, community: @community %>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="card empty-state">
+        <h3>No memes yet</h3>
+        <p>Upload memes about psychology, psychedelics, and religion.</p>
+        <% if @is_member %>
+          <a href="<%= new_community_meme_path(@community) %>" class="btn btn-primary" style="margin-top: 1rem;">Upload Meme</a>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="grid grid-2" style="margin-top: 2rem;">
+  <div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+      <h2>Recent Posts</h2>
+      <a href="<%= community_posts_path(@community) %>" class="btn btn-secondary btn-small">View All</a>
+    </div>
+    <% if @recent_posts.any? %>
+      <div class="post-list">
+        <% @recent_posts.each do |post| %>
+          <%= render "posts/post_card", post: post, community: @community %>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="card empty-state">
+        <h3>No posts yet</h3>
+        <p>Write long-form content about the topics that matter to your community.</p>
+        <% if @is_member %>
+          <a href="<%= new_community_post_path(@community) %>" class="btn btn-primary" style="margin-top: 1rem;">New Post</a>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+      <h2>Recent Laws</h2>
+      <a href="<%= community_laws_path(@community) %>" class="btn btn-secondary btn-small">View All</a>
+    </div>
     <% if @laws.any? %>
       <% @laws.each do |law| %>
         <div class="card law-card">
@@ -116,54 +170,7 @@
         <p>Laws will appear here when proposals pass.</p>
       </div>
     <% end %>
-    <a href="<%= community_laws_path(@community) %>" class="btn btn-secondary" style="margin-top: 0.5rem;">View All Laws</a>
   </div>
-</div>
-
-<div style="margin-top: 2rem;">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-    <h2>Meme Library</h2>
-    <a href="<%= community_memes_path(@community) %>" class="btn btn-secondary btn-small">View All</a>
-  </div>
-  <% @recent_memes = @community.memes.canon.or(@community.memes.approved).by_score.limit(4) %>
-  <% if @recent_memes.any? %>
-    <div class="meme-grid">
-      <% @recent_memes.each do |meme| %>
-        <%= render "memes/meme_card", meme: meme, community: @community %>
-      <% end %>
-    </div>
-  <% else %>
-    <div class="card empty-state">
-      <h3>No memes yet</h3>
-      <p>Upload memes about psychology, psychedelics, and religion.</p>
-      <% if @is_member %>
-        <a href="<%= new_community_meme_path(@community) %>" class="btn btn-primary" style="margin-top: 1rem;">Upload Meme</a>
-      <% end %>
-    </div>
-  <% end %>
-</div>
-
-<div style="margin-top: 2rem;">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-    <h2>Recent Posts</h2>
-    <a href="<%= community_posts_path(@community) %>" class="btn btn-secondary btn-small">View All</a>
-  </div>
-  <% @recent_posts = @community.posts.canon.or(@community.posts.approved).by_score.limit(3) %>
-  <% if @recent_posts.any? %>
-    <div class="post-list">
-      <% @recent_posts.each do |post| %>
-        <%= render "posts/post_card", post: post, community: @community %>
-      <% end %>
-    </div>
-  <% else %>
-    <div class="card empty-state">
-      <h3>No posts yet</h3>
-      <p>Write long-form content about the topics that matter to your community.</p>
-      <% if @is_member %>
-        <a href="<%= new_community_post_path(@community) %>" class="btn btn-primary" style="margin-top: 1rem;">New Post</a>
-      <% end %>
-    </div>
-  <% end %>
 </div>
 
 <% if @is_member && current_user.admin_of?(@community) %>

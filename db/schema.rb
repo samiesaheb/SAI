@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_02_06_000002) do
+ActiveRecord::Schema[8.0].define(version: 2026_02_07_094127) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -213,6 +213,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_06_000002) do
     t.index ["status"], name: "index_posts_on_status"
   end
 
+  create_table "proposal_memes", force: :cascade do |t|
+    t.integer "proposal_id", null: false
+    t.integer "meme_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["meme_id"], name: "index_proposal_memes_on_meme_id"
+    t.index ["proposal_id", "meme_id"], name: "index_proposal_memes_on_proposal_id_and_meme_id", unique: true
+    t.index ["proposal_id"], name: "index_proposal_memes_on_proposal_id"
+  end
+
   create_table "proposals", force: :cascade do |t|
     t.string "title", null: false
     t.text "body", null: false
@@ -253,4 +263,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_06_000002) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "activities", "communities"
   add_foreign_key "activities", "users"
+  add_foreign_key "proposal_memes", "memes"
+  add_foreign_key "proposal_memes", "proposals"
 end

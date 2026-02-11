@@ -19,7 +19,7 @@ class PostsController < ApplicationController
       @posts.by_score
     end
 
-    @posts = @posts.includes(:author, :post_votes)
+    @posts = @posts.includes(:author, post_votes: { user: :memberships })
     @canon_posts = @community.posts.canon.by_category(@category.presence).by_score.limit(5)
   end
 
@@ -78,7 +78,7 @@ class PostsController < ApplicationController
   end
 
   def set_post
-    @post = @community.posts.find(params[:id])
+    @post = @community.posts.includes(post_votes: { user: :memberships }).find(params[:id])
   end
 
   def post_params

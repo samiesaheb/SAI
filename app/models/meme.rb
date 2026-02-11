@@ -10,6 +10,8 @@ class Meme < ApplicationRecord
   belongs_to :author, class_name: "User"
   has_many :meme_votes, dependent: :destroy
   has_many :comments, as: :commentable, dependent: :destroy
+  has_many :proposal_memes, dependent: :destroy
+  has_many :proposals, through: :proposal_memes
   has_one_attached :image
 
   attr_accessor :image_url
@@ -84,29 +86,27 @@ class Meme < ApplicationRecord
 
   # Weighted score based on voter reputation
   def score
-    meme_votes.includes(user: :memberships).sum do |vote|
-      membership = vote.user.memberships.find_by(community: community)
-      weight = membership&.vote_weight || 1.0
+    meme_votes.to_a.sum do |vote|
+      weight = vote.user&.memberships&.find { |m| m.community_id == community_id }&.vote_weight || 1.0
       vote.value * weight
     end.round(1)
   end
 
   def weighted_upvotes
-    meme_votes.where(value: 1).includes(user: :memberships).sum do |vote|
-      membership = vote.user.memberships.find_by(community: community)
-      membership&.vote_weight || 1.0
+    meme_votes.to_a.select { |v| v.value == 1 }.sum do |vote|
+      vote.user&.memberships&.find { |m| m.community_id == community_id }&.vote_weight || 1.0
     end.round(1)
   end
 
   def weighted_downvotes
-    meme_votes.where(value: -1).includes(user: :memberships).sum do |vote|
-      membership = vote.user.memberships.find_by(community: community)
-      membership&.vote_weight || 1.0
+    meme_votes.to_a.select { |v| v.value == -1 }.sum do |vote|
+      vote.user&.memberships&.find { |m| m.community_id == community_id }&.vote_weight || 1.0
     end.round(1)
   end
 
   def user_vote(user)
-    meme_votes.find_by(user: user)
+    return nil unless user
+    meme_votes.to_a.find { |v| v.user_id == user.id }
   end
 
   def locked?
@@ -135,6 +135,7 @@ class Meme < ApplicationRecord
   end
 
   def check_canon!
+    meme_votes.reset
     return unless status == "approved" && score >= CANON_THRESHOLD
     update!(status: "canon", canon_at: Time.current)
 

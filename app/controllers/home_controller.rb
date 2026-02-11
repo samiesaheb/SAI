@@ -6,6 +6,12 @@ class HomeController < ApplicationController
                         .order(created_at: :desc)
                         .limit(10)
 
+    # Load active proposals for everyone
+    @recent_proposals = Proposal.active
+                                .includes(:community, :author, :votes)
+                                .order(created_at: :desc)
+                                .limit(10)
+
     if logged_in?
       @my_communities = current_user.communities.includes(:memberships, :proposals, :laws)
       my_community_ids = @my_communities.map(&:id)
@@ -19,12 +25,11 @@ class HomeController < ApplicationController
                                         .group(:community_id)
                                         .count
 
-      @recent_proposals = Proposal.active
-                                  .joins(:community => :memberships)
-                                  .where(memberships: { user_id: current_user.id })
-                                  .includes(:community, :author)
-                                  .order(created_at: :desc)
-                                  .limit(10)
+      @recent_memes = Meme.where(community_id: my_community_ids)
+                          .where(status: %w[approved canon])
+                          .includes(:community, :author, meme_votes: { user: :memberships }, image_attachment: :blob)
+                          .order(created_at: :desc)
+                          .limit(4)
 
       @recent_activities = Activity.feed_for(current_user).limit(10)
     end

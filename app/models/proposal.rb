@@ -6,6 +6,8 @@ class Proposal < ApplicationRecord
   belongs_to :author, class_name: "User"
   has_many :votes, dependent: :destroy
   has_one :law, dependent: :destroy
+  has_many :proposal_memes, dependent: :destroy
+  has_many :memes, through: :proposal_memes
 
   validates :title, presence: true, length: { maximum: 200 }
   validates :body, presence: true, length: { maximum: 10_000 }
