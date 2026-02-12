@@ -72,15 +72,13 @@
     </div>
     <% if @active_proposals.any? %>
       <% @active_proposals.each do |proposal| %>
-        <div class="card proposal-card">
+        <a href="<%= community_proposal_path(@community, proposal) %>" class="card proposal-card clickable-card">
           <div class="proposal-header">
-            <h3 class="proposal-title">
-              <a href="<%= community_proposal_path(@community, proposal) %>"><%= proposal.title %></a>
-            </h3>
+            <h3 class="proposal-title"><%= proposal.title %></h3>
             <span class="status-badge status-voting">Voting</span>
           </div>
           <p class="proposal-meta">
-            by <a href="<%= user_path(username: proposal.author.username) %>" class="profile-link"><%= proposal.author.display_name_or_username %></a> &middot;
+            by <%= proposal.author.display_name_or_username %> &middot;
             <%= time_ago_in_words(proposal.voting_ends_at) %> left
           </p>
           <div class="vote-progress" style="margin-top: 1rem;">
@@ -92,7 +90,7 @@
               <div class="progress-fill yes" style="width: <%= proposal.yes_percentage %>%;"></div>
             </div>
           </div>
-        </div>
+        </a>
       <% end %>
     <% else %>
       <div class="card empty-state">
@@ -155,14 +153,12 @@
     </div>
     <% if @laws.any? %>
       <% @laws.each do |law| %>
-        <div class="card law-card">
-          <h3 class="proposal-title">
-            <a href="<%= community_law_path(@community, law) %>"><%= law.title %></a>
-          </h3>
+        <a href="<%= community_law_path(@community, law) %>" class="card law-card clickable-card">
+          <h3 class="proposal-title"><%= law.title %></h3>
           <p class="law-version">
             v<%= law.version %> &middot; Passed <%= time_ago_in_words(law.passed_at) %> ago
           </p>
-        </div>
+        </a>
       <% end %>
     <% else %>
       <div class="card empty-state">

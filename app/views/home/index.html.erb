@@ -67,16 +67,14 @@
   <% if @recent_proposals.any? %>
     <div class="grid grid-2">
       <% @recent_proposals.each do |proposal| %>
-        <div class="card proposal-card">
+        <a href="<%= community_proposal_path(proposal.community, proposal) %>" class="card proposal-card clickable-card">
           <div class="proposal-header">
-            <h3 class="proposal-title">
-              <a href="<%= community_proposal_path(proposal.community, proposal) %>"><%= proposal.title %></a>
-            </h3>
+            <h3 class="proposal-title"><%= proposal.title %></h3>
             <span class="status-badge status-voting">Voting</span>
           </div>
           <p class="proposal-meta">
-            in <a href="<%= community_path(proposal.community) %>"><%= proposal.community.name %></a> &middot;
-            by <a href="<%= user_path(username: proposal.author.username) %>" class="profile-link"><%= proposal.author.display_name_or_username %></a> &middot;
+            in <%= proposal.community.name %> &middot;
+            by <%= proposal.author.display_name_or_username %> &middot;
             <%= time_ago_in_words(proposal.voting_ends_at) %> left
           </p>
           <div class="vote-progress" style="margin-top: 0.75rem;">
@@ -88,7 +86,7 @@
               <div class="progress-fill yes" style="width: <%= proposal.yes_percentage %>%;"></div>
             </div>
           </div>
-        </div>
+        </a>
       <% end %>
     </div>
   <% else %>

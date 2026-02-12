@@ -12,13 +12,13 @@
 
 <% if @laws.any? %>
   <% @laws.each do |law| %>
-    <div class="card law-card law-card-with-votes">
-      <%= render "shared/law_votes", law: law, community: @community %>
+    <div class="card law-card law-card-with-votes clickable-card" onclick="window.location='<%= community_law_path(@community, law) %>';" style="cursor: pointer;">
+      <div onclick="event.stopPropagation();">
+        <%= render "shared/law_votes", law: law, community: @community %>
+      </div>
       <div class="law-content">
         <div class="proposal-header">
-          <h3 class="proposal-title">
-            <a href="<%= community_law_path(@community, law) %>"><%= law.title %></a>
-          </h3>
+          <h3 class="proposal-title"><%= law.title %></h3>
           <span class="law-version">v<%= law.version %></span>
         </div>
         <p class="proposal-meta">
