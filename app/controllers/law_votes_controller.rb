@@ -5,26 +5,28 @@ class LawVotesController < ApplicationController
   before_action :require_membership
 
   def create
-    @post_vote = @post.post_votes.find_or_initialize_by(user: current_user)
+    @law_vote = @law.law_votes.find_or_initialize_by(user: current_user)
     new_value = params[:value].to_i
 
-    # If trying to set to 0 (remove/neutral) but no vote exists yet, do nothing
-    if new_value == 0 && !@post_vote.persisted?
-      respond_to do |format|
-        format.html { redirect_to community_post_path(@community, @post) }
-        format.turbo_stream { head :ok }
-      end
-      return
+    if @law_vote.persisted? && @law_vote.value == new_value
+      # Toggle off: same button clicked again
+      @law_vote.destroy
+    elsif @law_vote.persisted?
+      # Switch vote direction
+      @law_vote.update!(value: new_value)
+    else
+      # New vote
+      @law_vote.value = new_value
+      @law_vote.save!
     end
 
-    # If the vote exists and the value hasn't changed, do nothing
-    if @post_vote.persisted? && @post_vote.value == new_value
-      respond_to do |format|
-        format.html { redirect_to community_post_path(@community, @post) }
-        format.turbo_stream { head :ok }
-      end
-      return
+    @law = Law.includes(law_votes: { user: :memberships }).find(@law.id)
+
+    respond_to do |format|
+      format.html { redirect_to community_law_path(@community, @law) }
+      format.turbo_stream
     end
+  end
 
   private
 
