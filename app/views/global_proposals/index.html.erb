@@ -1,0 +1,66 @@
+<div class="global-layout">
+  <div class="global-main">
+    <div class="page-header">
+      <h1 class="page-title">All Proposals</h1>
+    </div>
+
+    <h2 style="margin-bottom: 1rem;">Active Proposals</h2>
+    <% if @active_proposals.any? %>
+      <% @active_proposals.each do |proposal| %>
+        <a href="<%= community_proposal_path(proposal.community, proposal) %>" class="card proposal-card clickable-card">
+          <div class="proposal-header">
+            <h3 class="proposal-title"><%= proposal.title %></h3>
+            <span class="status-badge status-voting">Voting</span>
+          </div>
+          <p class="proposal-meta">
+            in <%= proposal.community.name %> &middot;
+            by <%= proposal.author.display_name_or_username %> &middot;
+            <%= time_ago_in_words(proposal.voting_ends_at) %> left &middot;
+            <%= proposal.total_votes %> votes<% if proposal.memes.any? %>
+            &middot; <%= pluralize(proposal.memes.size, "meme") %><% end %>
+          </p>
+          <div class="vote-progress" style="margin-top: 0.75rem;">
+            <div class="progress-label">
+              <span>Yes: <%= proposal.yes_percentage %>%</span>
+              <span><%= proposal.total_votes %> votes</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill yes" style="width: <%= proposal.yes_percentage %>%;"></div>
+            </div>
+          </div>
+        </a>
+      <% end %>
+    <% else %>
+      <div class="card empty-state">
+        <h3>No active proposals</h3>
+        <p>Active proposals from all communities will appear here.</p>
+      </div>
+    <% end %>
+
+    <h2 style="margin: 2rem 0 1rem;">Past Proposals</h2>
+    <% if @ended_proposals.any? %>
+      <% @ended_proposals.each do |proposal| %>
+        <a href="<%= community_proposal_path(proposal.community, proposal) %>" class="card proposal-card clickable-card <%= proposal.status %>">
+          <div class="proposal-header">
+            <h3 class="proposal-title"><%= proposal.title %></h3>
+            <span class="status-badge status-<%= proposal.status %>"><%= proposal.status.capitalize %></span>
+          </div>
+          <p class="proposal-meta">
+            in <%= proposal.community.name %> &middot;
+            by <%= proposal.author.display_name_or_username %> &middot;
+            <%= proposal.total_votes %> votes &middot;
+            <%= proposal.yes_percentage %>% yes<% if proposal.memes.any? %>
+            &middot; <%= pluralize(proposal.memes.size, "meme") %><% end %>
+          </p>
+        </a>
+      <% end %>
+    <% else %>
+      <div class="card empty-state">
+        <h3>No past proposals</h3>
+        <p>Completed proposals will appear here.</p>
+      </div>
+    <% end %>
+  </div>
+
+  <%= render "shared/communities_sidebar" %>
+</div>

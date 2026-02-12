@@ -42,9 +42,14 @@ Rails.application.routes.draw do
     end
   end
 
+  # Global pages (aggregate across all communities)
+  get 'posts', to: 'global_posts#index', as: :global_posts
+  get 'memes', to: 'global_memes#index', as: :global_memes
+  get 'proposals', to: 'global_proposals#index', as: :global_proposals
+
   # Health check
   get "up" => "rails/health#show", as: :rails_health_check
 
   # Root
-  root "home#index"
+  root "global_proposals#index"
 end

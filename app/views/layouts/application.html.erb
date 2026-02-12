@@ -17,6 +17,28 @@
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
     <script>
+      (function() {
+        var theme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+      })();
+    </script>
+    <script>
+      function toggleTheme() {
+        var current = document.documentElement.getAttribute('data-theme') || 'light';
+        var next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+        updateThemeIcon();
+      }
+      function updateThemeIcon() {
+        var btn = document.getElementById('theme-toggle-btn');
+        if (btn) {
+          var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+          btn.textContent = isDark ? '\u2600\uFE0F' : '\uD83C\uDF19';
+        }
+      }
+      document.addEventListener('DOMContentLoaded', updateThemeIcon);
+      document.addEventListener('turbo:load', updateThemeIcon);
       function toggleReplyForm(commentId) {
         var form = document.getElementById("reply-form-" + commentId);
         if (form) {
@@ -36,6 +58,7 @@
         <div class="navbar-top">
           <a href="<%= root_path %>" class="logo">Common Consensus</a>
           <div class="navbar-user">
+            <button id="theme-toggle-btn" class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button>
             <% if logged_in? %>
               <a href="<%= user_path(username: current_user.username) %>" class="user-info profile-link"><%= current_user.display_name_or_username %></a>
               <%= button_to "Logout", logout_path, method: :delete, class: "btn btn-secondary btn-small" %>
@@ -54,6 +77,13 @@
             <button type="submit" class="search-btn">🔍</button>
           <% end %>
         </div>
+        <% if logged_in? %>
+          <div class="navbar-nav">
+            <a href="<%= global_proposals_path %>" class="nav-pill <%= 'active' if controller_name == 'global_proposals' %>">Proposals</a>
+            <a href="<%= global_memes_path %>" class="nav-pill <%= 'active' if controller_name == 'global_memes' %>">Memes</a>
+            <a href="<%= global_posts_path %>" class="nav-pill <%= 'active' if controller_name == 'global_posts' %>">Posts</a>
+          </div>
+        <% end %>
         <div class="navbar-block">
           <a href="<%= blocks_path %>" class="nav-block-link">⛓️ Block #<%= Block.current_height %></a>
         </div>
@@ -73,7 +103,7 @@
 
     <footer class="footer">
       <div class="container">
-        <p>Common Consensus - Building consensus through transparent governance</p>
+        <p><strong style="color: var(--primary);">Common Consensus</strong> &mdash; Building consensus through transparent governance</p>
       </div>
     </footer>
   </body>

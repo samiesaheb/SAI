@@ -10,6 +10,9 @@
     <a href="<%= search_path(q: @query, type: "communities") %>" class="tab <%= 'active' if @type == 'communities' %>">
       Communities (<%= @communities.size %>)
     </a>
+    <a href="<%= search_path(q: @query, type: "proposals") %>" class="tab <%= 'active' if @type == 'proposals' %>">
+      Proposals (<%= @proposals.size %>)
+    </a>
     <a href="<%= search_path(q: @query, type: "posts") %>" class="tab <%= 'active' if @type == 'posts' %>">
       Posts (<%= @posts.size %>)
     </a>
@@ -61,6 +64,29 @@
     </div>
   <% end %>
 
+  <%# Proposals results %>
+  <% if @proposals.any? && %w[all proposals].include?(@type) %>
+    <div class="search-section">
+      <h2 style="margin: 2rem 0 1rem;">Proposals</h2>
+      <% @proposals.each do |proposal| %>
+        <a href="<%= community_proposal_path(proposal.community, proposal) %>" class="card proposal-card clickable-card <%= proposal.status %>">
+          <div class="proposal-header">
+            <h3 class="proposal-title"><%= proposal.title %></h3>
+            <span class="status-badge status-<%= proposal.voting_active? ? 'voting' : proposal.status %>">
+              <%= proposal.voting_active? ? 'Voting' : proposal.status.capitalize %>
+            </span>
+          </div>
+          <p class="proposal-meta">
+            in <%= proposal.community.name %> &middot;
+            by <%= proposal.author.display_name_or_username %> &middot;
+            <%= proposal.total_votes %> votes<% if proposal.memes.any? %>
+            &middot; <%= pluralize(proposal.memes.size, "meme") %><% end %>
+          </p>
+        </a>
+      <% end %>
+    </div>
+  <% end %>
+
   <%# Posts results %>
   <% if @posts.any? && %w[all posts].include?(@type) %>
     <div class="search-section">
@@ -88,6 +114,6 @@
 <% else %>
   <div class="card empty-state">
     <h3>Search Common Consensus</h3>
-    <p>Find communities, posts, and memes across the platform.</p>
+    <p>Find communities, proposals, posts, and memes across the platform.</p>
   </div>
 <% end %>

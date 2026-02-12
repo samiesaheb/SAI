@@ -5,15 +5,17 @@ class SearchController < ApplicationController
 
     if @query.present?
       @communities = search_communities if %w[all communities].include?(@type)
+      @proposals = search_proposals if %w[all proposals].include?(@type)
       @posts = search_posts if %w[all posts].include?(@type)
       @memes = search_memes if %w[all memes].include?(@type)
     end
 
     @communities ||= Community.none
+    @proposals ||= Proposal.none
     @posts ||= Post.none
     @memes ||= Meme.none
 
-    @total_count = @communities.size + @posts.size + @memes.size
+    @total_count = @communities.size + @proposals.size + @posts.size + @memes.size
   end
 
   private
@@ -23,6 +25,13 @@ class SearchController < ApplicationController
                     "%#{@query}%", "%#{@query}%", "%#{@query}%")
             .order(created_at: :desc)
             .limit(20)
+  end
+
+  def search_proposals
+    Proposal.where("title LIKE ? OR body LIKE ?", "%#{@query}%", "%#{@query}%")
+            .includes(:community, :author, :votes, :memes)
+            .order(created_at: :desc)
+            .limit(30)
   end
 
   def search_posts

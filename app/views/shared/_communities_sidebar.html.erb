@@ -1,0 +1,15 @@
+<aside class="sidebar">
+  <h3 class="sidebar-heading">Communities</h3>
+  <% if @sidebar_communities.any? %>
+    <div class="sidebar-communities">
+      <% @sidebar_communities.each do |community| %>
+        <a href="<%= logged_in? ? community_path(community) : login_path %>" class="sidebar-community-link">
+          <span class="sidebar-community-name"><%= community.name %></span>
+          <span class="sidebar-community-meta"><%= community.category.titleize %> &middot; <%= community.member_count %> members</span>
+        </a>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="sidebar-empty">No communities yet.</p>
+  <% end %>
+</aside>

@@ -1,0 +1,31 @@
+<div class="global-layout">
+  <div class="global-main">
+    <div class="page-header">
+      <h1 class="page-title">All Memes</h1>
+    </div>
+
+    <div class="category-tabs">
+      <a href="<%= global_memes_path %>" class="tab <%= 'active' if @category.blank? %>">All</a>
+      <% Meme::CATEGORIES.each do |cat| %>
+        <a href="<%= global_memes_path(category: cat) %>" class="tab <%= 'active' if @category == cat %>">
+          <%= cat == "psychology" ? "🧠" : cat == "psychedelics" ? "🍄" : "🕉️" %> <%= cat.titleize %>
+        </a>
+      <% end %>
+    </div>
+
+    <% if @memes.any? %>
+      <div class="meme-grid">
+        <% @memes.each do |meme| %>
+          <%= render "memes/meme_card", meme: meme, community: meme.community %>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="card empty-state">
+        <h3>No memes yet</h3>
+        <p>Memes from all communities will appear here.</p>
+      </div>
+    <% end %>
+  </div>
+
+  <%= render "shared/communities_sidebar" %>
+</div>

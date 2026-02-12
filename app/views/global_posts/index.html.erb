@@ -1,0 +1,37 @@
+<div class="global-layout">
+  <div class="global-main">
+    <div class="page-header">
+      <h1 class="page-title">All Posts</h1>
+    </div>
+
+    <div class="category-tabs">
+      <a href="<%= global_posts_path %>" class="tab <%= 'active' if @category.blank? %>">All</a>
+      <% Post::CATEGORIES.each do |cat| %>
+        <a href="<%= global_posts_path(category: cat, sort: @sort) %>" class="tab <%= 'active' if @category == cat %>">
+          <%= Post.new(category: cat).category_label %>
+        </a>
+      <% end %>
+    </div>
+
+    <div class="post-sort-tabs">
+      <a href="<%= global_posts_path(category: @category, sort: "score") %>" class="tab <%= 'active' if @sort == 'score' %>">Top Scored</a>
+      <a href="<%= global_posts_path(category: @category, sort: "quality") %>" class="tab <%= 'active' if @sort == 'quality' %>">Best Quality</a>
+      <a href="<%= global_posts_path(category: @category, sort: "recent") %>" class="tab <%= 'active' if @sort == 'recent' %>">Recent</a>
+    </div>
+
+    <% if @posts.any? %>
+      <div class="post-list">
+        <% @posts.each do |post| %>
+          <%= render "posts/post_card", post: post, community: post.community %>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="card empty-state">
+        <h3>No posts yet</h3>
+        <p>Posts from all communities will appear here.</p>
+      </div>
+    <% end %>
+  </div>
+
+  <%= render "shared/communities_sidebar" %>
+</div>
