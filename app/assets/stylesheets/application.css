@@ -2920,6 +2920,7 @@ a.profile-stat:hover .stat-value {
 }
 
 .sidebar-heading {
+  display: block;
   font-size: 0.8125rem;
   font-weight: 700;
   margin-bottom: 0.75rem;
@@ -2928,6 +2929,7 @@ a.profile-stat:hover .stat-value {
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--text-muted);
+  text-decoration: none;
 }
 
 .sidebar-communities {
