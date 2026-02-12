@@ -79,6 +79,7 @@
         </div>
         <% if logged_in? %>
           <div class="navbar-nav">
+            <a href="<%= communities_path %>" class="nav-pill <%= 'active' if controller_name == 'communities' %>">Communities</a>
             <a href="<%= global_proposals_path %>" class="nav-pill <%= 'active' if controller_name == 'global_proposals' %>">Proposals</a>
             <a href="<%= global_memes_path %>" class="nav-pill <%= 'active' if controller_name == 'global_memes' %>">Memes</a>
             <a href="<%= global_posts_path %>" class="nav-pill <%= 'active' if controller_name == 'global_posts' %>">Posts</a>
