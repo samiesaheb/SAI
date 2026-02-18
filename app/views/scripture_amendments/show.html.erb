@@ -1,0 +1,117 @@
+<% content_for :title, @amendment.title %>
+
+<div style="max-width: 800px;">
+  <p class="community-meta" style="margin-bottom: 0.5rem;">
+    <a href="<%= scripture_path %>">Scripture of Unity</a> &rsaquo; Amendment
+  </p>
+
+  <div class="page-header">
+    <h1 class="page-title"><%= @amendment.title %></h1>
+    <span class="status-badge status-<%= @amendment.status %>"><%= @amendment.status.capitalize %></span>
+  </div>
+
+  <div class="card" style="margin-bottom: 1.5rem;">
+    <p class="proposal-meta" style="margin-bottom: 1rem;">
+      Proposed by <a href="<%= user_path(username: @amendment.proposer.username) %>" class="profile-link"><%= @amendment.proposer.display_name_or_username %></a> &middot;
+      <%= time_ago_in_words(@amendment.created_at) %> ago
+      <% if @amendment.voting_active? %>
+        &middot; <span class="time-remaining"><%= time_ago_in_words(@amendment.voting_ends_at) %> left to vote</span>
+      <% end %>
+    </p>
+
+    <h3 style="margin-bottom: 0.5rem;">Rationale</h3>
+    <div style="line-height: 1.7; margin-bottom: 1.5rem;"><%= simple_format(@amendment.rationale) %></div>
+
+    <h3 style="margin-bottom: 0.5rem;">Proposed Scripture Text</h3>
+    <div style="white-space: pre-wrap; line-height: 1.7; font-size: 0.95rem; background: var(--bg-secondary); padding: 1rem; border-radius: 6px; max-height: 500px; overflow-y: auto;">
+      <%= @amendment.proposed_content %>
+    </div>
+  </div>
+
+  <% if @amendment.voting_active? && logged_in? %>
+    <div class="voting-section" id="voting-section">
+      <h3>Cast Your Vote</h3>
+      <div id="vote-error"></div>
+
+      <div class="vote-buttons">
+        <%= form_with url: scripture_scripture_amendment_scripture_amendment_votes_path(@amendment), method: :post, data: { turbo: true } do |f| %>
+          <input type="hidden" name="value" value="yes">
+          <button type="submit" class="vote-btn yes <%= 'selected' if @user_vote&.yes? %>">Yes</button>
+        <% end %>
+
+        <%= form_with url: scripture_scripture_amendment_scripture_amendment_votes_path(@amendment), method: :post, data: { turbo: true } do |f| %>
+          <input type="hidden" name="value" value="no">
+          <button type="submit" class="vote-btn no <%= 'selected' if @user_vote&.no? %>">No</button>
+        <% end %>
+      </div>
+
+      <% if @user_vote %>
+        <p style="color: var(--text-muted); font-size: 0.875rem;">
+          You voted: <strong><%= @user_vote.value.capitalize %></strong>. You can change your vote until voting ends.
+        </p>
+      <% end %>
+    </div>
+  <% elsif @amendment.voting_active? && !logged_in? %>
+    <div class="card" style="text-align: center; padding: 1.5rem; margin-bottom: 1.5rem; background: var(--bg-secondary);">
+      <p><a href="<%= login_path %>">Log in</a> to vote on this amendment.</p>
+    </div>
+  <% end %>
+
+  <div class="card" style="margin-top: 1.5rem;">
+    <h3 style="margin-bottom: 1rem;">Voting Results</h3>
+
+    <div class="vote-progress">
+      <div class="progress-label">
+        <span>Yes: <%= @amendment.yes_votes %> votes (<%= @amendment.yes_percentage %>% weighted)</span>
+        <span>Threshold: 60%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill yes" style="width: <%= @amendment.yes_percentage %>%;"></div>
+      </div>
+    </div>
+
+    <div class="vote-progress">
+      <div class="progress-label">
+        <span>No: <%= @amendment.no_votes %> votes (<%= @amendment.no_percentage %>% weighted)</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill no" style="width: <%= @amendment.no_percentage %>%;"></div>
+      </div>
+    </div>
+
+    <div style="margin-top: 0.75rem; font-size: 0.9rem; color: var(--text-muted);">
+      Total votes: <%= @amendment.total_votes %> &middot; Quorum: 3 minimum
+      <% if @amendment.quorum_met? %>
+        <span style="color: var(--success, green);">&#10003; Quorum met</span>
+      <% else %>
+        <span>(need <%= [3 - @amendment.total_votes, 0].max %> more)</span>
+      <% end %>
+    </div>
+
+    <% if @amendment.status != "voting" || @amendment.voting_ended? %>
+      <div class="consensus-status <%= @amendment.status == 'passed' ? 'met' : 'not-met' %>" style="margin-top: 1rem;">
+        <% if @amendment.status == "passed" %>
+          Amendment passed &mdash; the scripture has been updated to v<%= @scripture.version %>.
+        <% elsif @amendment.status == "failed" %>
+          <% if !@amendment.quorum_met? %>
+            Failed &mdash; quorum not met (need at least 3 votes).
+          <% else %>
+            Failed &mdash; consensus threshold not reached (<%= @amendment.yes_percentage %>% &lt; 60%).
+          <% end %>
+        <% else %>
+          Voting has ended. Awaiting finalization.
+        <% end %>
+      </div>
+    <% else %>
+      <div class="consensus-status <%= @amendment.consensus_reached? && @amendment.quorum_met? ? 'met' : 'not-met' %>" style="margin-top: 1rem;">
+        <% if @amendment.quorum_met? && @amendment.consensus_reached? %>
+          On track to pass if voting ended now.
+        <% elsif !@amendment.quorum_met? %>
+          Quorum not yet met &mdash; need at least 3 votes.
+        <% else %>
+          Consensus threshold not yet reached (need 60% weighted yes).
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>

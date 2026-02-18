@@ -86,10 +86,11 @@ class Meme < ApplicationRecord
 
   # Weighted score based on voter reputation
   def score
-    meme_votes.to_a.sum do |vote|
+    total = meme_votes.to_a.sum do |vote|
       weight = vote.user&.memberships&.find { |m| m.community_id == community_id }&.vote_weight || 1.0
       vote.value * weight
-    end.round(1)
+    end
+    total % 1 == 0 ? total.to_i : total.round(1)
   end
 
   def weighted_upvotes

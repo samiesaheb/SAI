@@ -1,0 +1,97 @@
+<% content_for :title, "Scripture of Unity" %>
+
+<div style="max-width: 900px;">
+  <div class="page-header">
+    <h1 class="page-title">Scripture of Unity</h1>
+    <% if current_user&.credible_for_scripture? %>
+      <a href="<%= new_scripture_scripture_amendment_path %>" class="btn btn-primary">Propose Amendment</a>
+    <% elsif logged_in? %>
+      <span class="btn btn-secondary" title="Reach 'trusted' reputation in a community to propose changes" style="cursor: default; opacity: 0.6;">Propose Amendment</span>
+    <% end %>
+  </div>
+
+  <div class="card" style="margin-bottom: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+      <h2 style="margin: 0;">Canonical Text <span style="font-size: 0.9rem; font-weight: normal; color: var(--text-muted);">v<%= @scripture.version %></span></h2>
+      <% if @scripture.updated_by %>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">Last updated by <%= @scripture.updated_by.display_name_or_username %></span>
+      <% end %>
+    </div>
+
+    <% if @scripture.content.present? %>
+      <div style="white-space: pre-wrap; line-height: 1.7; font-size: 0.95rem;"><%= @scripture.content %></div>
+    <% else %>
+      <p style="color: var(--text-muted); font-style: italic;">No content yet. The scripture will be established through the first passed amendment.</p>
+    <% end %>
+  </div>
+
+  <% if !logged_in? %>
+    <div class="card" style="text-align: center; padding: 1.5rem; margin-bottom: 2rem; background: var(--bg-secondary);">
+      <p style="margin-bottom: 1rem; color: var(--text-muted);">
+        <a href="<%= login_path %>">Log in</a> or <a href="<%= signup_path %>">sign up</a> to vote on amendments.
+        Reach <strong>trusted</strong> reputation in a community to propose amendments.
+      </p>
+    </div>
+  <% elsif !current_user.credible_for_scripture? %>
+    <div class="card" style="padding: 1rem 1.5rem; margin-bottom: 2rem; background: var(--bg-secondary); border-left: 3px solid var(--primary);">
+      <p style="margin: 0; font-size: 0.9rem; color: var(--text-muted);">
+        Reach <strong>trusted</strong> reputation in at least one community to propose amendments.
+      </p>
+    </div>
+  <% end %>
+
+  <h2 style="margin-bottom: 1rem;">Active Amendments</h2>
+  <% if @active_amendments.any? %>
+    <div class="grid grid-2" style="margin-bottom: 2rem;">
+      <% @active_amendments.each do |amendment| %>
+        <a href="<%= scripture_scripture_amendment_path(amendment) %>" class="card proposal-card clickable-card">
+          <div class="proposal-header">
+            <h3 class="proposal-title"><%= amendment.title %></h3>
+            <span class="status-badge status-voting">Voting</span>
+          </div>
+          <p class="proposal-meta">
+            by <%= amendment.proposer.display_name_or_username %> &middot;
+            <%= time_ago_in_words(amendment.voting_ends_at) %> left
+          </p>
+          <div class="vote-progress" style="margin-top: 0.75rem;">
+            <div class="progress-label">
+              <span>Yes: <%= amendment.yes_percentage %>%</span>
+              <span><%= amendment.total_votes %> votes</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill yes" style="width: <%= amendment.yes_percentage %>%;"></div>
+            </div>
+          </div>
+        </a>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="card empty-state" style="margin-bottom: 2rem;">
+      <h3>No active amendments</h3>
+      <p>No amendments are currently open for voting.</p>
+    </div>
+  <% end %>
+
+  <h2 style="margin-bottom: 1rem;">Past Amendments</h2>
+  <% if @past_amendments.any? %>
+    <div style="margin-bottom: 2rem;">
+      <% @past_amendments.each do |amendment| %>
+        <a href="<%= scripture_scripture_amendment_path(amendment) %>" class="card proposal-card clickable-card" style="margin-bottom: 0.75rem; display: block;">
+          <div class="proposal-header">
+            <h3 class="proposal-title" style="font-size: 1rem;"><%= amendment.title %></h3>
+            <span class="status-badge status-<%= amendment.status %>"><%= amendment.status.capitalize %></span>
+          </div>
+          <p class="proposal-meta">
+            by <%= amendment.proposer.display_name_or_username %> &middot;
+            <%= time_ago_in_words(amendment.created_at) %> ago
+          </p>
+        </a>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="card empty-state">
+      <h3>No past amendments</h3>
+      <p>Completed amendments will appear here.</p>
+    </div>
+  <% end %>
+</div>

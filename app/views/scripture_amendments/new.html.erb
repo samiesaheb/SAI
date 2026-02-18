@@ -1,0 +1,65 @@
+<% content_for :title, "Propose Amendment" %>
+
+<div style="max-width: 800px;">
+  <p class="community-meta" style="margin-bottom: 0.5rem;">
+    <a href="<%= scripture_path %>">Scripture of Unity</a> &rsaquo; Propose Amendment
+  </p>
+
+  <div class="page-header">
+    <h1 class="page-title">Propose Amendment</h1>
+  </div>
+
+  <div class="card" style="margin-bottom: 2rem;">
+    <h3 style="margin-bottom: 0.75rem;">Current Canonical Text <span style="font-size: 0.85rem; font-weight: normal; color: var(--text-muted);">v<%= @scripture.version %></span></h3>
+    <% if @scripture.content.present? %>
+      <div style="white-space: pre-wrap; line-height: 1.7; font-size: 0.9rem; color: var(--text-muted); max-height: 300px; overflow-y: auto; background: var(--bg-secondary); padding: 1rem; border-radius: 6px;">
+        <%= @scripture.content %>
+      </div>
+    <% else %>
+      <p style="color: var(--text-muted); font-style: italic;">The scripture has no content yet. Your amendment will establish the initial text.</p>
+    <% end %>
+  </div>
+
+  <%= form_with model: @amendment, url: scripture_scripture_amendments_path do |f| %>
+    <% if @amendment.errors.any? %>
+      <div class="flash flash-alert" style="margin-bottom: 1rem;">
+        <% @amendment.errors.full_messages.each do |msg| %>
+          <p><%= msg %></p>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div class="card">
+      <div style="margin-bottom: 1.5rem;">
+        <%= f.label :title, "Amendment Title", style: "display: block; font-weight: 600; margin-bottom: 0.5rem;" %>
+        <%= f.text_field :title, placeholder: "Brief title for this amendment", maxlength: 200,
+            style: "width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--consensus-border); border-radius: 6px; font-size: 1rem; background: var(--bg-primary); color: var(--consensus-text); box-sizing: border-box;" %>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Max 200 characters</p>
+      </div>
+
+      <div style="margin-bottom: 1.5rem;">
+        <%= f.label :rationale, "Rationale", style: "display: block; font-weight: 600; margin-bottom: 0.5rem;" %>
+        <%= f.text_area :rationale, placeholder: "Explain why this change is needed and what problem it solves...", rows: 5, maxlength: 2000,
+            style: "width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--consensus-border); border-radius: 6px; font-size: 1rem; background: var(--bg-primary); color: var(--consensus-text); resize: vertical; box-sizing: border-box;" %>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Max 2,000 characters</p>
+      </div>
+
+      <div style="margin-bottom: 1.5rem;">
+        <%= f.label :proposed_content, "Proposed Full Scripture Text", style: "display: block; font-weight: 600; margin-bottom: 0.5rem;" %>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">Write the complete new scripture text. If passed, this will replace the current canonical text entirely.</p>
+        <%= f.text_area :proposed_content, placeholder: "Write the full proposed scripture text here...", rows: 20, maxlength: 50_000,
+            style: "width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--consensus-border); border-radius: 6px; font-size: 0.95rem; font-family: inherit; background: var(--bg-primary); color: var(--consensus-text); resize: vertical; box-sizing: border-box;" %>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Max 50,000 characters</p>
+      </div>
+
+      <div style="display: flex; gap: 1rem; align-items: center;">
+        <%= f.submit "Submit Amendment", class: "btn btn-primary" %>
+        <a href="<%= scripture_path %>" style="color: var(--text-muted);">Cancel</a>
+      </div>
+
+      <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted);">
+        Voting will be open for 7 days. An amendment passes with 60% weighted yes votes and at least 3 votes.
+      </p>
+    </div>
+  <% end %>
+</div>

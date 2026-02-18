@@ -616,6 +616,82 @@ main {
   white-space: pre-wrap;
 }
 
+:root {
+  /* Light Mode - Frosty Glass */
+  --consensus-bg: rgba(255, 255, 255, 0.7); 
+  --consensus-border: rgba(255, 255, 255, 0.4);
+  --consensus-text: #1a202c;
+  --consensus-accent: #b8860b; 
+}
+
+[data-theme="dark"] {
+  /* Dark Mode - Obsidian Glass */
+  --consensus-bg: rgba(15, 15, 20, 0.65);
+  --consensus-border: rgba(255, 255, 255, 0.08);
+  --consensus-text: #f1f1f1;
+  --consensus-accent: #ffcc33;
+  --consensus-shadow: rgba(0, 0, 0, 0.6);
+}
+
+.welcome-section {
+  max-width: 800px;
+  margin: 4rem auto;
+  padding: 3rem;
+  text-align: center;
+  border-radius: 28px;
+  
+  /* The Glass Effect */
+  background: var(--consensus-bg);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%); /* Safari support */
+  
+  /* Border & Shadow */
+  border: 1px solid var(--consensus-border);
+  box-shadow: 0 25px 50px -12px var(--consensus-shadow, rgba(0,0,0,0.1));
+}
+
+.welcome-title {
+  color: var(--consensus-text);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 2.5rem;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.5rem;
+}
+
+.welcome-content p {
+  color: var(--consensus-text);
+  line-height: 1.7;
+  font-size: 1.15rem;
+  margin-bottom: 1.5rem;
+  opacity: 0.85; /* Softens the text for better readability on glass */
+}
+
+.welcome-content strong {
+  color: var(--consensus-accent);
+  text-shadow: 0 0 15px rgba(255, 204, 51, 0.2); /* Subtle glow for keywords */
+}
+
+.welcome-content strong {
+  color: var(--consensus-accent);
+  font-weight: 600;
+}
+
+.btn-primary {
+  background: var(--consensus-btn-bg);
+  color: var(--consensus-btn-text);
+  padding: 14px 36px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: bold;
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.btn-primary:hover {
+  transform: scale(1.05);
+}
+
 /* Meme Picker (proposal form) */
 .meme-picker {
   display: grid;

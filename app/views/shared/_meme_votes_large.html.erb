@@ -1,4 +1,5 @@
 <% user_vote = meme.user_vote(current_user) if logged_in? %>
+
 <div class="vote-large-controls">
   <% if logged_in? %>
     <%= form_with url: community_meme_meme_votes_path(community, meme), method: :post, data: { turbo: true } do %>
@@ -17,7 +18,7 @@
   <% if logged_in? %>
     <%= form_with url: community_meme_meme_votes_path(community, meme), method: :post, data: { turbo: true } do %>
       <input type="hidden" name="value" value="-1">
-      <button type="submit" class="vote-btn-large down <%= 'active' if user_vote&.downvote? && meme.score < 0 %>" title="Downvote"></button>
+      <button type="submit" class="vote-btn-large down <%= 'active' if user_vote&.downvote? %>" title="Downvote"></button>
     <% end %>
   <% else %>
     <a href="<%= login_path %>" class="vote-btn-large down" title="Log in to vote"></a>
