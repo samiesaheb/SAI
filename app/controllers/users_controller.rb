@@ -31,8 +31,11 @@ class UsersController < ApplicationController
       communities: @user.memberships.count,
       posts: @user.posts.count,
       memes: @user.memes.count,
-      proposals: @user.proposals.count
+      proposals: @user.proposals.count,
+      followers: @user.followers.count,
+      following: @user.following_users.count
     }
+    @is_following = current_user&.following?(@user)
   end
 
   private

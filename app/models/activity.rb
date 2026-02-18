@@ -22,7 +22,15 @@ class Activity < ApplicationRecord
 
   def self.feed_for(user)
     community_ids = user.communities.pluck(:id)
-    for_communities(community_ids).recent.includes(:user, :community, :trackable)
+    following_ids = user.following_users.pluck(:id)
+    base = recent.includes(:user, :community, :trackable)
+    community_scope = base.where(community_id: community_ids)
+    if following_ids.any?
+      following_scope = base.where(user_id: following_ids, action: "meme_created")
+      community_scope.or(following_scope)
+    else
+      community_scope
+    end
   end
 
   def description

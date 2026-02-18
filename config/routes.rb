@@ -5,7 +5,9 @@ Rails.application.routes.draw do
   delete "logout", to: "sessions#destroy"
   get "signup", to: "users#new"
   post "signup", to: "users#create"
-  resources :users, only: [:show], param: :username
+  resources :users, only: [:show], param: :username do
+    resource :following, only: [:create, :destroy]
+  end
 
   # Activities feed
   resources :activities, only: [:index]
@@ -39,6 +41,13 @@ Rails.application.routes.draw do
       resources :comments, only: [:create, :destroy] do
         resource :comment_vote, only: [:create], path: "vote"
       end
+    end
+  end
+
+  # Scripture of Unity
+  resource :scripture, only: [:show] do
+    resources :scripture_amendments, only: [:new, :create, :show], path: "amendments" do
+      resources :scripture_amendment_votes, only: [:create], path: "vote"
     end
   end
 

@@ -1,111 +1,144 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title><%= content_for(:title) || "Common Consensus" %></title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <%= csrf_meta_tags %>
-    <%= csp_meta_tag %>
+<head>
+  <title><%= content_for(:title) || "Common Consensus" %></title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  <%= yield :head %>
+  <link rel="icon" href="/icon.png" type="image/png">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icon.png">
+  <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+  <%= javascript_importmap_tags %>
+  <script>
+    (function() {
+      var theme = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+  <script>
+    function toggleTheme() {
+      var current = document.documentElement.getAttribute('data-theme') || 'light';
+      var next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      updateThemeIcon();
+    }
 
-    <%= yield :head %>
-
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
-
-    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
-    <%= javascript_importmap_tags %>
-    <script>
-      (function() {
-        var theme = localStorage.getItem('theme') || 'light';
-        document.documentElement.setAttribute('data-theme', theme);
-      })();
-    </script>
-    <script>
-      function toggleTheme() {
-        var current = document.documentElement.getAttribute('data-theme') || 'light';
-        var next = current === 'dark' ? 'light' : 'dark';
-        document.documentElement.setAttribute('data-theme', next);
-        localStorage.setItem('theme', next);
-        updateThemeIcon();
+    function updateThemeIcon() {
+      var btn = document.getElementById('theme-toggle-btn');
+      if (btn) {
+        var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        btn.textContent = isDark ? '\u2600\uFE0F' : '\uD83C\uDF19';
       }
-      function updateThemeIcon() {
-        var btn = document.getElementById('theme-toggle-btn');
-        if (btn) {
-          var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-          btn.textContent = isDark ? '\u2600\uFE0F' : '\uD83C\uDF19';
+    }
+
+    document.addEventListener('DOMContentLoaded', updateThemeIcon);
+    document.addEventListener('turbo:load', updateThemeIcon);
+
+    function toggleReplyForm(commentId) {
+      var form = document.getElementById("reply-form-" + commentId);
+      if (form) {
+        form.style.display = form.style.display === "none" ? "block" : "none";
+        if (form.style.display === "block") {
+          var textarea = form.querySelector("textarea");
+          if (textarea) textarea.focus();
         }
       }
-      document.addEventListener('DOMContentLoaded', updateThemeIcon);
-      document.addEventListener('turbo:load', updateThemeIcon);
-      function toggleReplyForm(commentId) {
-        var form = document.getElementById("reply-form-" + commentId);
-        if (form) {
-          form.style.display = form.style.display === "none" ? "block" : "none";
-          if (form.style.display === "block") {
-            var textarea = form.querySelector("textarea");
-            if (textarea) textarea.focus();
-          }
-        }
-      }
-    </script>
-  </head>
-
-  <body>
-    <nav class="navbar">
-      <div class="container">
-        <div class="navbar-top">
-          <a href="<%= root_path %>" class="logo">Common Consensus</a>
-          <div class="navbar-user">
-            <button id="theme-toggle-btn" class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button>
-            <% if logged_in? %>
-              <a href="<%= user_path(username: current_user.username) %>" class="user-info profile-link"><%= current_user.display_name_or_username %></a>
-              <%= button_to "Logout", logout_path, method: :delete, class: "btn btn-secondary btn-small" %>
-            <% else %>
-              <a href="<%= login_path %>" class="btn btn-secondary btn-small">Login</a>
-              <a href="<%= signup_path %>" class="btn btn-primary btn-small">Sign Up</a>
-            <% end %>
-          </div>
-        </div>
-        <div class="navbar-search">
-          <%= form_tag search_path, method: :get, class: "search-form", data: { controller: "search", action: "submit->search#submit" } do %>
-            <div class="search-input-wrapper">
-              <input type="text" name="q" placeholder="Search communities, posts, memes..." value="<%= params[:q] %>" class="search-input" data-search-target="input" data-action="input->search#toggleClear">
-              <button type="button" class="search-clear" data-search-target="clear" data-action="search#clear" hidden>&times;</button>
-            </div>
-            <button type="submit" class="search-btn">🔍</button>
+    }
+  </script>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="container">
+      <div class="navbar-top">
+        <a href="<%= root_path %>" class="logo">Common Consensus</a>
+        <div class="navbar-user">
+          <button id="theme-toggle-btn" class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button>
+          <% if logged_in? %>
+            <a href="<%= user_path(username: current_user.username) %>" class="user-info profile-link"><%= current_user.display_name_or_username %></a>
+            <%= button_to "Logout", logout_path, method: :delete, class: "btn btn-secondary btn-small" %>
+          <% else %>
+            <a href="<%= login_path %>" class="btn btn-secondary btn-small">Login</a>
+            <a href="<%= signup_path %>" class="btn btn-primary btn-small">Sign Up</a>
           <% end %>
         </div>
-        <% if logged_in? %>
-          <div class="navbar-nav">
-            <a href="<%= communities_path %>" class="nav-pill <%= 'active' if controller_name == 'communities' %>">Communities</a>
-            <a href="<%= global_proposals_path %>" class="nav-pill <%= 'active' if controller_name == 'global_proposals' %>">Proposals</a>
-            <a href="<%= global_memes_path %>" class="nav-pill <%= 'active' if controller_name == 'global_memes' %>">Memes</a>
-            <a href="<%= global_posts_path %>" class="nav-pill <%= 'active' if controller_name == 'global_posts' %>">Posts</a>
+      </div>
+      <div class="navbar-search">
+        <%= form_tag search_path, method: :get, class: "search-form", data: { controller: "search", action: "submit->search#submit" } do %>
+          <div class="search-input-wrapper">
+            <input type="text" name="q" placeholder="Search communities, posts, memes..." value="<%= params[:q] %>" class="search-input" data-search-target="input" data-action="input->search#toggleClear">
+            <button type="button" class="search-clear" data-search-target="clear" data-action="search#clear" hidden>&times;</button>
           </div>
+          <button type="submit" class="search-btn">🔍</button>
         <% end %>
-        <div class="navbar-block">
-          <a href="<%= blocks_path %>" class="nav-block-link">⛓️ Block #<%= Block.current_height %></a>
+      </div>
+      <% if logged_in? %>
+        <div class="navbar-nav">
+          <a href="<%= communities_path %>" class="nav-pill <%= 'active' if controller_name == 'communities' %>">Communities</a>
+          <a href="<%= scripture_path %>" class="nav-pill <%= 'active' if controller_name == 'scriptures' || controller_name == 'scripture_amendments' %>">Scripture</a>
+          <a href="<%= global_proposals_path %>" class="nav-pill <%= 'active' if controller_name == 'global_proposals' %>">Proposals</a>
+          <a href="<%= global_memes_path %>" class="nav-pill <%= 'active' if controller_name == 'global_memes' %>">Memes</a>
+          <a href="<%= global_posts_path %>" class="nav-pill <%= 'active' if controller_name == 'global_posts' %>">Posts</a>
         </div>
-      </div>
-    </nav>
-
-    <main class="container">
-      <% if flash[:notice] %>
-        <div class="flash flash-notice"><%= flash[:notice] %></div>
       <% end %>
-      <% if flash[:alert] %>
-        <div class="flash flash-alert"><%= flash[:alert] %></div>
-      <% end %>
-
-      <%= yield %>
-    </main>
-
-    <footer class="footer">
-      <div class="container">
-        <p><strong style="color: var(--primary);">Common Consensus</strong> &mdash; Building consensus through transparent governance</p>
+      <div class="navbar-block">
+        <a href="<%= blocks_path %>" class="nav-block-link">⛓️ Block #<%= Block.current_height %></a>
       </div>
-    </footer>
-  </body>
+    </div>
+  </nav>
+  <main class="container">
+  <% if (controller_name == 'global_proposals' && action_name == 'index' && !logged_in?) || (controller_name == 'scriptures' && action_name == 'show' && logged_in?) %>
+  <section class="welcome-section">
+    <h2 class="welcome-title">Common Consensus</h2>
+
+    <div class="welcome-content">
+      <p>
+        Welcome to a beacon of unity on the journey toward <strong>Artificial General Intelligence</strong>.
+        At our core lies the <em>Scripture of Unity</em>—a living testament to human wisdom,
+        evolving through the collective voice of the many.
+      </p>
+
+      <p>
+        We believe in the power of <strong>Biological General Intelligence (BGI)</strong>.
+        As BGIs, our natural ingenuity must not be eclipsed, but harmonized with the machine to
+        safeguard our livelihoods, our safety, and our shared future.
+      </p>
+
+      <p>
+        Through <strong>SAI</strong>, we are bridging the ancient resonance of faith with the
+        precision of science. Together, we are connecting the dots of millions of hours of
+        human effort to unlock a path toward true ascension.
+      </p>
+    </div>
+
+    <div style="margin-top: 2rem;">
+      <iframe src="/scripture-of-unity.pdf" style="width: 100%; height: 600px; border: 1px solid var(--consensus-border); border-radius: 12px;" title="Scripture of Unity"></iframe>
+    </div>
+
+    <div style="margin-top: 2rem; display: flex; gap: 1.5rem; justify-content: center; align-items: center;">
+      <% unless logged_in? %>
+        <a href="<%= signup_path %>" class="btn btn-secondary btn-large">Join the Vision</a>
+        <a href="<%= scripture_path %>" style="color: var(--consensus-text); text-decoration: underline; font-size: 1rem;">Learn More</a>
+      <% end %>
+    </div>
+  </section>
+  <% end %>
+    <% if flash[:notice] %>
+      <div class="flash flash-notice"><%= flash[:notice] %></div>
+    <% end %>
+    <% if flash[:alert] %>
+      <div class="flash flash-alert"><%= flash[:alert] %></div>
+    <% end %>
+    <%= yield %>
+  </main>
+  <footer class="footer">
+    <div class="container">
+      <p><strong style="color: var(--primary);">Common Consensus</strong> &mdash; Building consensus through transparent governance</p>
+    </div>
+  </footer>
+</body>
 </html>

@@ -3,6 +3,17 @@
   <div>
     <h1 class="page-title"><%= @user.display_name_or_username %></h1>
     <p class="community-meta">@<%= @user.username %> &middot; Member since <%= @user.created_at.strftime("%B %Y") %></p>
+    <% if logged_in? && current_user != @user %>
+      <div style="margin-top: 0.75rem;">
+        <% if @is_following %>
+          <%= button_to "Unfollow", user_following_path(username: @user.username),
+                method: :delete, class: "btn btn-secondary btn-small" %>
+        <% else %>
+          <%= button_to "Follow", user_following_path(username: @user.username),
+                method: :post, class: "btn btn-primary btn-small" %>
+        <% end %>
+      </div>
+    <% end %>
   </div>
 </div>
 
@@ -22,6 +33,14 @@
   <div class="profile-stat">
     <span class="stat-value"><%= @stats[:proposals] %></span>
     <span class="stat-label">Proposals</span>
+  </div>
+  <div class="profile-stat">
+    <span class="stat-value"><%= @stats[:followers] %></span>
+    <span class="stat-label">Followers</span>
+  </div>
+  <div class="profile-stat">
+    <span class="stat-value"><%= @stats[:following] %></span>
+    <span class="stat-label">Following</span>
   </div>
 </div>
 

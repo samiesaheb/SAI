@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_02_12_051543) do
+ActiveRecord::Schema[8.0].define(version: 2026_02_18_000002) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -110,6 +110,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_12_051543) do
     t.index ["creator_id"], name: "index_communities_on_creator_id"
     t.index ["invite_token"], name: "index_communities_on_invite_token", unique: true
     t.index ["slug"], name: "index_communities_on_slug", unique: true
+  end
+
+  create_table "followings", force: :cascade do |t|
+    t.integer "follower_id", null: false
+    t.integer "following_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["follower_id", "following_id"], name: "index_followings_on_follower_id_and_following_id", unique: true
+    t.index ["follower_id"], name: "index_followings_on_follower_id"
+    t.index ["following_id"], name: "index_followings_on_following_id"
   end
 
   create_table "law_votes", force: :cascade do |t|
@@ -238,6 +248,40 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_12_051543) do
     t.index ["status"], name: "index_proposals_on_status"
   end
 
+  create_table "scripture_amendment_votes", force: :cascade do |t|
+    t.integer "scripture_amendment_id", null: false
+    t.integer "user_id", null: false
+    t.string "value", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["scripture_amendment_id", "user_id"], name: "index_scripture_amendment_votes_unique", unique: true
+    t.index ["scripture_amendment_id"], name: "index_scripture_amendment_votes_on_scripture_amendment_id"
+    t.index ["user_id"], name: "index_scripture_amendment_votes_on_user_id"
+  end
+
+  create_table "scripture_amendments", force: :cascade do |t|
+    t.integer "scripture_id", null: false
+    t.integer "user_id", null: false
+    t.string "title", null: false
+    t.text "rationale", null: false
+    t.text "proposed_content", null: false
+    t.string "status", default: "voting", null: false
+    t.datetime "voting_ends_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["scripture_id"], name: "index_scripture_amendments_on_scripture_id"
+    t.index ["user_id"], name: "index_scripture_amendments_on_user_id"
+  end
+
+  create_table "scriptures", force: :cascade do |t|
+    t.text "content", default: "", null: false
+    t.integer "version", default: 1, null: false
+    t.integer "updated_by_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["updated_by_id"], name: "index_scriptures_on_updated_by_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", null: false
     t.string "username", null: false
@@ -264,6 +308,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_12_051543) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "activities", "communities"
   add_foreign_key "activities", "users"
+  add_foreign_key "followings", "users", column: "follower_id"
+  add_foreign_key "followings", "users", column: "following_id"
   add_foreign_key "proposal_memes", "memes"
   add_foreign_key "proposal_memes", "proposals"
+  add_foreign_key "scripture_amendment_votes", "scripture_amendments"
+  add_foreign_key "scripture_amendment_votes", "users"
+  add_foreign_key "scripture_amendments", "scriptures"
+  add_foreign_key "scripture_amendments", "users"
+  add_foreign_key "scriptures", "users", column: "updated_by_id"
 end
